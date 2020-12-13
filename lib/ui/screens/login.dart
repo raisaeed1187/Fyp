@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/screens/register.dart';
 import 'package:flutterfirebase/ui/screens/verifynumber.dart';
@@ -13,6 +15,31 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   ProgressDialog progressDialog;
+  getFavorites() {
+    try {
+      // List<DocumentSnapshot> favoriteMoblies = [];
+
+      Firestore.instance
+          .collection('favorites')
+          .where('user_id', isEqualTo: '2345')
+          .snapshots()
+          .listen((snapshot) {
+        snapshot.documents.forEach((mobile) {
+          Firestore.instance
+              .collection('mobiles')
+              .document(mobile.data['product_id'])
+              .get()
+              .then((value) {
+            // print('favorite: $value');
+            AppData.favoriteMobiles.add(value);
+          });
+        });
+        // print("favorite length in loop: ${favoriteMoblies.length}");
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +62,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 SubmitButton(
                   title: "Login",
                   act: () async {
+                    AppData.favoriteMobiles.clear();
+                    getFavorites();
                     progressDialog.show();
-                    Future.delayed(const Duration(milliseconds: 1500), () {
+                    Future.delayed(const Duration(seconds: 2), () {
+                      print('favorite : ${AppData.favoriteMobiles.length}');
+
                       setState(() {
                         progressDialog.hide();
                         Navigator.pushReplacement(

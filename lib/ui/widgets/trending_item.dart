@@ -1,3 +1,4 @@
+import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
 import 'package:flutterfirebase/ui/widgets/clip_shadow_path.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
@@ -74,7 +75,7 @@ class TrendingItem extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => ProductList(
-                  product: product,
+                  mobilesList: AppData.mobilesList,
                 )));
       },
     );

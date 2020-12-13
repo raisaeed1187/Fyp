@@ -3,17 +3,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_icons/ionicons.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
+import 'package:flutterfirebase/favorite/main.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
+import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
 import 'package:flutterfirebase/ui/widgets/star_rating.dart';
+import 'package:provider/provider.dart';
 
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final Product product;
   final List<Color> gradientColors;
 
   ProductCard({this.product, this.gradientColors});
+
+  @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  List<DocumentSnapshot> favorites = [];
+  String checkFavoriteMethod(String productId) {
+    String favorite;
+    // print("favorite length: ${AppData.favoriteMobiles.length}");
+    setState(() {
+      favorites = AppData.favoriteMobiles
+          .where((element) => element.documentID == productId)
+          .toList();
+    });
+
+    if (favorites.length > 0) {
+      setState(() {
+        favorite = favorites[0].documentID;
+      });
+    } else {
+      setState(() {
+        favorite = "";
+      });
+    }
+    return favorite;
+  }
+
+  bool favorite = false;
+  bool deleteFavorite = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +84,8 @@ class ProductCard extends StatelessWidget {
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      AppData.compareList.add(product.mobile);
+                                      AppData.compareList
+                                          .add(widget.product.mobile);
                                       return AlertDialog(
                                         title: Row(
                                           children: <Widget>[
@@ -104,12 +144,16 @@ class ProductCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Expanded(
-                          child: Icon(
-                            Ionicons.getIconData("ios-heart-empty"),
-                            color: Colors.black54,
+                        Container(
+                          width: 30,
+                          height: 20,
+                          child: StreamProvider<List<FavoriteModal>>.value(
+                            value: allFavorite,
+                            child: FavoriteWidget(
+                              mobile: widget.product.mobile,
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     Container(
@@ -128,9 +172,16 @@ class ProductCard extends StatelessWidget {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ProductDetails(mobile: product.mobile),
+            builder: (context) => ProductPage(
+              product: widget.product,
+            ),
           ),
         );
+        // Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => ProductDetails(mobile: product.mobile),
+        //   ),
+        // );
       },
     );
   }
@@ -142,7 +193,9 @@ class ProductCard extends StatelessWidget {
           child: Container(
             width: 100,
             height: 100,
-            child: Image.network(product.icon, fit: BoxFit.contain),
+            child: Image.network(
+                widget.product.icon != null ? widget.product.icon : '',
+                fit: BoxFit.contain),
             // decoration: BoxDecoration(
             //   // image: DecorationImage(
             //   //     image: AssetImage(product.icon), fit: BoxFit.contain),
@@ -159,17 +212,17 @@ class ProductCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Text(
-          product.company,
+          widget.product.company,
           style: TextStyle(fontSize: 12, color: Color(0XFFb1bdef)),
         ),
         Text(
-          product.name,
+          widget.product.name,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
         ),
-        StarRating(rating: product.rating, size: 10),
+        StarRating(rating: widget.product.rating, size: 10),
         Row(
           children: <Widget>[
-            Text(product.price,
+            Text(widget.product.price,
                 style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -205,9 +258,112 @@ class ProductCard extends StatelessWidget {
         Expanded(
           child: Container(
               margin: EdgeInsets.only(left: 10),
-              child: Text(product.mobile[feature])),
+              child: Text(widget.product.mobile[feature])),
         )
       ],
+    );
+  }
+
+  _Favorite() {
+    bool check = false;
+    // print('favorite: ${AppData.favoriteMobiles.length}');
+    return Container(
+      child: checkFavoriteMethod(widget.product.mobile.documentID) ==
+              widget.product.mobile.documentID
+          ? InkWell(
+              onTap: () {
+                if (deleteFavorite == false) {
+                  Firestore.instance
+                      .collection('favorites')
+                      .where('product_id',
+                          isEqualTo: widget.product.mobile.documentID)
+                      .snapshots()
+                      .listen((snapshot) {
+                    snapshot.documents.forEach((doc) {
+                      Firestore.instance
+                          .collection('favorites')
+                          .document(doc.documentID)
+                          .delete()
+                          .catchError((e) {
+                        print(e.toString());
+                      });
+                    });
+                  });
+
+                  Future.delayed(Duration(seconds: 2)).then((value) {
+                    setState(() {
+                      deleteFavorite = true;
+                    });
+                  });
+                } else {
+                  CollectionReference collectionReference =
+                      Firestore.instance.collection('favorites');
+                  collectionReference.add({
+                    'user_id': '2345',
+                    'product_id': widget.product.mobile.documentID
+                  }).then((value) => print(value.documentID));
+                  Future.delayed(Duration(seconds: 2)).then((value) {
+                    setState(() {
+                      deleteFavorite = false;
+                    });
+                  });
+                }
+              },
+              child: Icon(
+                // Ionicons.getIconData("ios-heart-empty"),
+                deleteFavorite ? Icons.favorite_border : Icons.favorite,
+                //  Icons.favorite,
+
+                color: deleteFavorite ? Colors.black54 : Colors.red,
+              ),
+            )
+          : InkWell(
+              onTap: () {
+                if (favorite == false) {
+                  CollectionReference collectionReference =
+                      Firestore.instance.collection('favorites');
+                  collectionReference.add({
+                    'user_id': '2345',
+                    'product_id': widget.product.mobile.documentID
+                  }).then((value) => print(value.documentID));
+
+                  Future.delayed(Duration(seconds: 2)).then((value) {
+                    setState(() {
+                      favorite = true;
+                    });
+                  });
+                } else {
+                  Firestore.instance
+                      .collection('favorites')
+                      .where('product_id',
+                          isEqualTo: widget.product.mobile.documentID)
+                      .snapshots()
+                      .listen((snapshot) {
+                    snapshot.documents.forEach((doc) {
+                      Firestore.instance
+                          .collection('favorites')
+                          .document(doc.documentID)
+                          .delete()
+                          .catchError((e) {
+                        print(e.toString());
+                      });
+                    });
+                  });
+
+                  Future.delayed(Duration(seconds: 2)).then((value) {
+                    setState(() {
+                      favorite = false;
+                    });
+                  });
+                }
+              },
+              child: Icon(
+                // Ionicons.getIconData("ios-heart-empty"),
+
+                favorite ? Icons.favorite : Icons.favorite_border,
+                color: favorite ? Colors.red : Colors.black54,
+              ),
+            ),
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_icons/ionicons.dart';
 import 'package:flutter_icons/material_community_icons.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/widgets/filter.dart';
@@ -17,18 +18,18 @@ import 'package:getflutter/components/search_bar/gf_search_bar.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class ProductList extends StatefulWidget {
+class FavoriteList extends StatefulWidget {
   List<DocumentSnapshot> mobilesList;
 
-  ProductList({this.mobilesList});
+  FavoriteList({this.mobilesList});
 
   @override
-  _ProductListState createState() => _ProductListState(mobilesList);
+  _FavoriteListState createState() => _FavoriteListState(mobilesList);
 }
 
-class _ProductListState extends State<ProductList> {
+class _FavoriteListState extends State<FavoriteList> {
   List<DocumentSnapshot> mobilesList;
-  _ProductListState(this.mobilesList);
+  _FavoriteListState(this.mobilesList);
   BorderRadiusGeometry radius = BorderRadius.only(
     topLeft: Radius.circular(24.0),
     topRight: Radius.circular(24.0),
@@ -123,41 +124,13 @@ class _ProductListState extends State<ProductList> {
             },
           ),
         ),
-        // title: Text(
-        //   "MobHub",
-        //   style: TextStyle(color: Colors.black, fontSize: 16),
-        // ),
         leading: IconButton(
           icon:
               Icon(Ionicons.getIconData("ios-arrow-back"), color: Colors.black),
           onPressed: () => Navigator.of(context)
               .push(MaterialPageRoute(builder: (context) => Home())),
         ),
-        actions: <Widget>[
-          // Padding(
-          //   padding: const EdgeInsets.only(right: 24.0),
-          //   child: SizedBox(
-          //     height: 18.0,
-          //     width: 18.0,
-          //     child: IconButton(
-          //       icon: Icon(
-          //         // MaterialCommunityIcons.getIconData("cart-outline"),
-          //         Icons.notifications,
-          //       ),
-          //       color: Colors.black,
-          //       onPressed: () {
-          //         Navigator.push(
-          //           context,
-          //           PageTransition(
-          //             type: PageTransitionType.fade,
-          //             child: ProductList(),
-          //           ),
-          //         );
-          //       },
-          //     ),
-          //   ),
-          // ),
-        ],
+        actions: <Widget>[],
         backgroundColor: Colors.white,
       ),
       body: SlidingUpPanel(
@@ -190,42 +163,11 @@ class _ProductListState extends State<ProductList> {
         borderRadius: radius,
         body: Container(
           padding: EdgeInsets.only(top: 18),
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                buildTrending(),
-              ],
-            ),
+          child: Column(
+            children: <Widget>[
+              buildTrending(),
+            ],
           ),
-          // child: StreamBuilder(
-          //     stream: Firestore.instance.collection('mobiles').snapshots(),
-          //     builder: (BuildContext context,
-          //         AsyncSnapshot<QuerySnapshot> snapshot) {
-          //       return GridView.count(
-          //         crossAxisCount: 2,
-          //         childAspectRatio: (itemWidth / itemHeight) * 1.1,
-          //         controller: ScrollController(keepScrollOffset: false),
-          //         shrinkWrap: true,
-          //         scrollDirection: Axis.vertical,
-          //         children:
-          //             List.generate(snapshot.data.documents.length, (index) {
-          //           DocumentSnapshot mobile = snapshot.data.documents[index];
-          //           return Center(
-          //             child: TrendingItem(
-          //               product: Product(
-          //                   company: mobile['brand'],
-          //                   name: mobile['product_name'],
-          //                   icon: mobile['product_image'],
-          //                   rating: 4.5,
-          //                   remainingQuantity: 5,
-          //                   price: 'Rs ${mobile['price']}',
-          //                   mobile: mobile),
-          //               gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
-          //             ),
-          //           );
-          //         }),
-          //       );
-          //     }),
         ),
       ),
     );
@@ -239,30 +181,59 @@ class _ProductListState extends State<ProductList> {
         Container(
           height: MediaQuery.of(context).size.height,
           child: StreamBuilder(
-              stream: Firestore.instance.collection('mobiles').snapshots(),
+              stream: allFavoriteQuery,
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
                   return Text('no data');
                 }
+                final mobiles = snapshot.data.documents;
                 return ListView.builder(
-                    itemCount: AppData.filterMobiles.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot mobile = AppData.filterMobiles[index];
-                      return ProductCard(
-                        product: Product(
-                          company: mobile['brand'],
-                          name: mobile['product_name'],
-                          icon: mobile['product_image'],
-                          rating: 4.5,
-                          remainingQuantity: 5,
-                          price: 'Rs ${mobile['price']}',
-                          mobile: mobile,
-                        ),
-                        gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
-                      );
-                    });
+                  shrinkWrap: true,
+                  itemCount: mobiles.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot doc = mobiles[index];
+                    return StreamBuilder(
+                        stream: Firestore.instance
+                            .collection('mobiles')
+                            .where('product_name',
+                                isEqualTo: doc.data['product_name'])
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snap) {
+                          if (!snap.hasData) {
+                            return Text('no data');
+                          }
+                          print(
+                              'mobile data: ${snap.data.documents[0]['product_name']}');
+                          return ListView.builder(
+                            itemCount: snap.data.documents.length,
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              DocumentSnapshot mobile =
+                                  snap.data.documents[index];
+                              return ProductCard(
+                                product: Product(
+                                  company: mobile['brand'],
+                                  name: mobile['product_name'],
+                                  icon: mobile['product_image'],
+                                  rating: 4.5,
+                                  remainingQuantity: 5,
+                                  price: 'Rs ${mobile['price']}',
+                                  mobile: mobile,
+                                ),
+                                gradientColors: [
+                                  Color(0XFFa466ec),
+                                  Colors.purple[400]
+                                ],
+                              );
+                            },
+                          );
+                        });
+                  },
+                );
               }),
         )
       ],

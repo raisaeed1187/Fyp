@@ -92,21 +92,21 @@ class Settings extends StatelessWidget {
       style: settingsStyle,
       child: Column(
         children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              print("Tiklandi");
-            },
-            child: SettingsItem(Feather.getIconData("briefcase"), '#9F6083',
-                'Orders', 'All your orders are listed.', () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: Checkout(),
-                ),
-              );
-            }),
-          ),
+          // GestureDetector(
+          //   onTap: () {
+          //     print("Tiklandi");
+          //   },
+          //   child: SettingsItem(Feather.getIconData("briefcase"), '#9F6083',
+          //       'Orders', 'All your orders are listed.', () {
+          //     Navigator.push(
+          //       context,
+          //       PageTransition(
+          //         type: PageTransitionType.fade,
+          //         child: Checkout(),
+          //       ),
+          //     );
+          //   }),
+          // ),
           SettingsItem(Feather.getIconData("settings"), '#FDB78B',
               'Account Settings', 'General ettings for your account', () {
             Navigator.push(
@@ -114,19 +114,6 @@ class Settings extends StatelessWidget {
               PageTransition(
                 type: PageTransitionType.fade,
                 child: AccountSettings(),
-              ),
-            );
-          }),
-          SettingsItem(
-              Feather.getIconData("tag"),
-              '#57CFE2',
-              'Discount coupons',
-              'Coupons you want to use for your shopping.', () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: Checkout(),
               ),
             );
           }),

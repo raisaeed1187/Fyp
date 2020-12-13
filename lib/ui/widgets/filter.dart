@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/ui/screens/products_list.dart';
 
 class Filtre extends StatefulWidget {
   @override
@@ -7,12 +9,24 @@ class Filtre extends StatefulWidget {
 }
 
 class _FiltreState extends State<Filtre> {
-  double _lowerValue = 60;
-  double _upperValue = 1000;
+  double _lowerValue = 6000;
+  double _upperValue = 50000;
+
+  void _priceFilter(int lower, int upper) {
+    setState(() {
+      AppData.filterMobiles = AppData.mobilesList
+          .where((mobile) =>
+              int.parse(mobile['price']) >= lower &&
+              int.parse(mobile['price']) <= upper)
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(12.0),
+      height: MediaQuery.of(context).size.height,
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,37 +46,48 @@ class _FiltreState extends State<Filtre> {
             ),
           ),
           SingleChildScrollView(
-            child: Row(
+            child: Wrap(
+              spacing: 5.0,
               children: <Widget>[
-                buildChip(
-                    "Iphone", Colors.grey.shade400, "A", Colors.grey.shade600),
-                buildChip("Sumsang", Theme.of(context).primaryColor, "A",
-                    Theme.of(context).primaryColor),
-                buildChip(
-                    "Oppo", Colors.grey.shade400, "A", Colors.grey.shade600),
-                buildChip(
-                    "Real Me", Colors.grey.shade400, "A", Colors.grey.shade600),
-                buildChip("Huawei", Theme.of(context).primaryColor, "A",
-                    Theme.of(context).primaryColor),
-                buildChip(
-                    "Infinix", Colors.grey.shade400, "A", Colors.grey.shade600),
-                buildChip(
-                    "HTC", Colors.grey.shade400, "A", Colors.grey.shade600),
+                filterChipWidget(
+                  chipName: 'Apple',
+                ),
+                filterChipWidget(
+                  chipName: 'Sumsang',
+                ),
+                filterChipWidget(
+                  chipName: 'Oppo',
+                ),
+                filterChipWidget(
+                  chipName: 'Realme',
+                ),
+                filterChipWidget(
+                  chipName: 'Infinix',
+                ),
+                filterChipWidget(
+                  chipName: 'Techno',
+                ),
+                filterChipWidget(
+                  chipName: 'Huawei',
+                ),
+                filterChipWidget(
+                  chipName: 'HTC',
+                ),
+                filterChipWidget(
+                  chipName: 'Vivo',
+                ),
+                filterChipWidget(
+                  chipName: 'Nokia',
+                ),
               ],
             ),
           ),
-          Row(
-            children: <Widget>[
-              buildChip(
-                  "Lorem", Colors.grey.shade400, "A", Colors.grey.shade600),
-              buildChip(
-                  "Ipsum", Colors.grey.shade400, "A", Colors.grey.shade600),
-              buildChip(
-                  "Dolır", Colors.grey.shade400, "A", Colors.grey.shade600),
-              buildChip(
-                  "Sit amed", Colors.grey.shade400, "A", Colors.grey.shade600),
-            ],
-          ),
+          // Row(
+          //   children: <Widget>[
+          //     buildChip(
+          //         "Infinix", Colors.grey.shade400, "A", Colors.grey.shade600),
+          //   ],
+          // ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text("SORT BY"),
@@ -151,8 +176,8 @@ class _FiltreState extends State<Filtre> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text("\$ " + '$_lowerValue'),
-                Text("\$ " + '$_upperValue'),
+                Text("Rs " + '$_lowerValue'),
+                Text("Rs " + '$_upperValue'),
               ],
             ),
           ),
@@ -179,16 +204,37 @@ class _FiltreState extends State<Filtre> {
                   borderRadius: BorderRadius.circular(4),
                   color: Colors.red.withOpacity(0.5)),
             ),
-            values: [30, 420],
+            values: [3000, 42000],
             rangeSlider: true,
-            max: 500,
+            max: 50000,
             min: 0,
             onDragging: (handlerIndex, lowerValue, upperValue) {
               _lowerValue = lowerValue;
               _upperValue = upperValue;
-              setState(() {});
+              // int lower = _lowerValue;
+              int lower = _lowerValue.round();
+              int upper = _upperValue.round();
+              print("lower :${lower.toString()}");
+              print("upper :${upper.toString()}");
+              print(AppData.filterMobiles.length);
+              _priceFilter(lower, upper);
+              print(AppData.filterMobiles.length);
             },
-          )
+          ),
+          Center(
+            child: FlatButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) =>
+                        ProductList(mobilesList: AppData.filterMobiles)));
+              },
+              color: Theme.of(context).primaryColor,
+              child: Text(
+                'Apply Filter',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -212,6 +258,43 @@ class _FiltreState extends State<Filtre> {
           print(label);
         },
       ),
+    );
+  }
+}
+
+class filterChipWidget extends StatefulWidget {
+  final String chipName;
+
+  filterChipWidget({Key key, this.chipName}) : super(key: key);
+
+  @override
+  _filterChipWidgetState createState() => _filterChipWidgetState();
+}
+
+class _filterChipWidgetState extends State<filterChipWidget> {
+  var _isSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilterChip(
+      label: Text(widget.chipName),
+      labelStyle: TextStyle(
+          color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold),
+      selected: _isSelected,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      backgroundColor: Colors.grey.shade400,
+      onSelected: (isSelected) {
+        setState(() {
+          _isSelected = isSelected;
+          AppData.filterMobiles = AppData.mobilesList
+              .where((mobile) => mobile['brand'] == widget.chipName)
+              .toList();
+          print(AppData.filterMobiles.length);
+        });
+      },
+      selectedColor: Theme.of(context).primaryColor,
     );
   }
 }

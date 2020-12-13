@@ -5,10 +5,12 @@ import 'package:flutterfirebase/PageCategories.dart';
 import 'package:flutterfirebase/PageHome.dart';
 // import 'package:flutterfirebase/PageSearch.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
+import 'package:flutterfirebase/favorite/main.dart';
 import 'package:flutterfirebase/filter/main.dart';
 // import 'package:flutterfirebase/home.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/pages/pageSearchResult.dart';
+import 'package:flutterfirebase/provider/provider.dart';
 import 'package:flutterfirebase/ui/main.dart';
 
 // import 'package:flutterfirebase/firebase.dart';

@@ -7,8 +7,10 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/painters/circlepainters.dart';
+import 'package:flutterfirebase/ui/screens/favorites_list.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
 import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/shoppingcart.dart';
@@ -20,9 +22,11 @@ import 'package:flutterfirebase/ui/widgets/occasions.dart';
 import 'package:flutterfirebase/ui/utils/navigator.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'checkout.dart';
 import 'products_list.dart';
 import 'usersettings.dart';
+import 'dart:async';
 
 class Home extends StatefulWidget {
   @override
@@ -46,8 +50,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
+
     fetchData();
+    // print('favorite in home:${AppData.favoriteMobiles.length}');
+
+    super.initState();
   }
 
   @override
@@ -132,7 +139,9 @@ class _HomeState extends State<Home> {
                                   context,
                                   PageTransition(
                                     type: PageTransitionType.fade,
-                                    child: ProductList(),
+                                    child: ProductList(
+                                      mobilesList: AppData.mobilesList,
+                                    ),
                                   ),
                                 );
                               },
@@ -213,6 +222,7 @@ class _HomeState extends State<Home> {
                         product: Product(
                             company: mobile['brand'],
                             name: mobile['product_name'],
+                            productId: mobile.documentID,
                             icon: mobile['product_image'],
                             rating: 4.5,
                             remainingQuantity: 5,
@@ -388,15 +398,16 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 title: Text(
-                  "Ali Anıl Koçak",
+                  "Saeed Anwar",
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: blackColor),
                 ),
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                  backgroundImage: AssetImage('assets/images/me1.jpg'),
+                  // backgroundImage: NetworkImage(
+                  //     "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
                 ),
               ),
               decoration: BoxDecoration(
@@ -424,27 +435,11 @@ class _HomeState extends State<Home> {
               );
             },
           ),
-          ListTile(
-            trailing: Icon(
-              Ionicons.getIconData('ios-radio-button-on'),
-              color: Color(0xFFFB7C7A),
-              size: 18,
+          StreamProvider<QuerySnapshot>.value(
+            value: allFavoriteQuery,
+            child: Container(
+              child: AllFavoritesWidget(),
             ),
-            leading: Icon(Feather.getIconData('gift'), color: blackColor),
-            title: Text('Wheel Spin(Free)',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: WhellFortune(),
-                ),
-              );
-            },
           ),
           ListTile(
             leading: Icon(Feather.getIconData('search'), color: blackColor),
@@ -485,9 +480,8 @@ class _HomeState extends State<Home> {
               color: Color(0xFFFB7C7A),
               size: 18,
             ),
-            leading:
-                Icon(Feather.getIconData('shopping-cart'), color: blackColor),
-            title: Text('Shopping Cart',
+            leading: Icon(Icons.compare_arrows, color: blackColor),
+            title: Text('Previous Comparison',
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -500,28 +494,6 @@ class _HomeState extends State<Home> {
                   child: ShoppingCart(true),
                 ),
               );
-            },
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('list'), color: blackColor),
-            title: Text('My Orders',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, ProductList());
-            },
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('award'), color: blackColor),
-            title: Text('Points',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, Checkout());
             },
           ),
           ListTile(
@@ -754,7 +726,9 @@ class CategoriesListView extends StatelessWidget {
                       context,
                       PageTransition(
                         type: PageTransitionType.fade,
-                        child: ProductList(),
+                        child: ProductList(
+                          mobilesList: AppData.mobilesList,
+                        ),
                       ),
                     );
                   },
@@ -809,6 +783,75 @@ class CategoriesListView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class AllFavoritesWidget extends StatefulWidget {
+  @override
+  _AllFavoritesWidgetState createState() => _AllFavoritesWidgetState();
+}
+
+class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final queryFavorites = Provider.of<QuerySnapshot>(context);
+
+    // AppData.favoriteMobiles.clear();
+    // queryFavorites.documents.forEach((element) {
+    //   Firestore.instance
+    //       .collection('mobiles')
+    //       .document(element.data['product_id'])
+    //       .get()
+    //       .then((value) {
+    //     // print('favorite: $value');
+    //     AppData.favoriteMobiles.add(value);
+    //   });
+    // });
+    print('total favorites: ${AppData.favoriteMobiles.length}');
+    return ListTile(
+      trailing: Container(
+        padding: EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Color(0xFFFB7C7A),
+        ),
+        child: TotalFavoritesWidget(),
+      ),
+      // Icon(
+      //   Ionicons.getIconData('ios-radio-button-on'),
+      //   color: Color(0xFFFB7C7A),
+      //   size: 18,
+      // ),
+      leading: Icon(Icons.favorite_border, color: Colors.black54),
+      title: Text('Favorites',
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black54)),
+      onTap: () {
+        Navigator.push(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: FavoriteList(
+              mobilesList: AppData.favoriteMobiles,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class TotalFavoritesWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final favorites = Provider.of<QuerySnapshot>(context);
+    return Text(
+      favorites.documents.length.toString(),
+      style: TextStyle(
+          color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
     );
   }
 }

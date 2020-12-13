@@ -5,6 +5,9 @@ import 'package:flutterfirebase/modal/product.dart';
 class AppData {
   static List<DocumentSnapshot> compareList = [];
   static List<DocumentSnapshot> mobilesList = [];
+  static List<DocumentSnapshot> filterMobiles = [];
+  static List<DocumentSnapshot> favoriteMobiles = [];
+
   static List<Product> productList = [
     Product(
         id: 1,

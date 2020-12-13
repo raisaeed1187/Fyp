@@ -5,7 +5,7 @@ import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/shoppingcart.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
-import 'package:flutterfirebase/ui/utils/colors.dart'; 
+import 'package:flutterfirebase/ui/utils/colors.dart';
 import 'package:flutterfirebase/ui/widgets/dotted_slider.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
 import 'package:flutterfirebase/ui/widgets/star_rating.dart';

@@ -1,6 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterfirebase/favorite/main.dart';
+import 'package:flutterfirebase/modal/favorite.dart';
+import 'package:flutterfirebase/ui/models/product.dart';
+import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
+import 'package:flutterfirebase/ui/widgets/item_product.dart';
+import 'package:flutterfirebase/ui/widgets/star_rating.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 class ProductDetails extends StatefulWidget {
   DocumentSnapshot mobile;
@@ -98,13 +106,27 @@ class _ProductDetailsState extends State<ProductDetails> {
               Navigator.of(context).pop();
             }),
         actions: <Widget>[
-          Stack(
-            alignment: Alignment.bottomLeft,
-            children: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.favorite, color: Color(0xFFFF6969)),
-                  onPressed: () {}),
-            ],
+          Container(
+            height: 40,
+            width: 40,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                StreamProvider<List<FavoriteModal>>.value(
+                  value: allFavorite,
+                  child: FavoriteWidget(
+                    mobile: mobile,
+                  ),
+                ),
+                // IconButton(
+                //   icon: Icon(
+                //     Icons.favorite,
+                //     color: Color(0xFFFF6969),
+                //   ),
+                //   onPressed: () {},
+                // ),
+              ],
+            ),
           )
         ],
       ),
@@ -254,7 +276,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   Container(
                                     margin: EdgeInsets.only(bottom: 10),
                                     child: Text(
-                                      'Sumsang',
+                                      'Daraz',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -262,7 +284,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     ),
                                   ),
                                   Text(
-                                    'Rs 1500',
+                                    "Rs ${mobile['price']}",
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
@@ -1155,6 +1177,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                     ],
                   ),
                 ),
+                // _buildComments(context),
+                BuildComments(
+                  mobID: mobile.documentID,
+                ),
+                _buildProducts(context),
               ],
             ),
           ),
@@ -1213,4 +1240,507 @@ class advantageWidget extends StatelessWidget {
       ],
     );
   }
+}
+
+class BuildComments extends StatefulWidget {
+  String mobID;
+  BuildComments({this.mobID});
+  @override
+  _BuildCommentsState createState() => _BuildCommentsState(this.mobID);
+}
+
+class _BuildCommentsState extends State<BuildComments> {
+  final commentController = TextEditingController();
+  String mobID;
+  _BuildCommentsState(this.mobID);
+  String comment;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(width: 1.0, color: Colors.black12),
+          bottom: BorderSide(width: 1.0, color: Colors.black12),
+        ),
+      ),
+      width: MediaQuery.of(context).size.width,
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  "Comments",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black54),
+                ),
+                Text(
+                  "View All",
+                  style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                  textAlign: TextAlign.end,
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Enter your comment',
+              ),
+              controller: commentController,
+              onChanged: (value) {
+                setState(() {
+                  comment = value;
+                });
+              },
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              color: Color(0xFFFB7C7A),
+              width: double.infinity,
+              child: FlatButton(
+                onPressed: () {
+                  var now = DateTime.now();
+                  print(now);
+                  CollectionReference collectionReference =
+                      Firestore.instance.collection('comments');
+                  collectionReference.add({
+                    'user_id': '2345',
+                    'user_name': 'Saeed Anwar',
+                    'user_image': '',
+                    'product_id': mobID,
+                    'comment': comment,
+                    'date_time': now,
+                  }).then((value) => print(value.documentID));
+                  commentController.clear();
+                },
+                child: Text(
+                  'Send',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            StreamBuilder(
+              stream: Firestore.instance
+                  .collection('comments')
+                  .where('product_id', isEqualTo: mobID)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Text('no data');
+                }
+                return ListView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot comment = snapshot.data.documents[index];
+
+                      return Container(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              child: Divider(
+                                color: Colors.black26,
+                                height: 4,
+                              ),
+                              height: 24,
+                            ),
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                              ),
+                              subtitle: Text(comment['comment']),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  // StarRating(rating: 4, size: 15),
+                                  Text(comment['user_name']),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(
+                                    DateFormat("yyyy-MM-dd hh:mm:ss")
+                                        .format(comment['date_time'].toDate()),
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
+              },
+            ),
+
+            // Container(
+            //   child: Column(
+            //     children: <Widget>[
+            //       SizedBox(
+            //         child: Divider(
+            //           color: Colors.black26,
+            //           height: 4,
+            //         ),
+            //         height: 24,
+            //       ),
+            //       ListTile(
+            //         leading: CircleAvatar(
+            //           backgroundImage: NetworkImage(
+            //               "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+            //         ),
+            //         subtitle: Text(
+            //             "Cats are good pets, for they are clean and are not noisy."),
+            //         title: Row(
+            //           mainAxisAlignment: MainAxisAlignment.start,
+            //           children: <Widget>[
+            //             // StarRating(rating: 4, size: 15),
+            //             Text('Saeed Anwar'),
+            //             SizedBox(
+            //               width: 8,
+            //             ),
+            //             Text(
+            //               "12 Sep 2019",
+            //               style: TextStyle(fontSize: 12, color: Colors.black54),
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+_buildComments(BuildContext context) {
+  String comment;
+  return Container(
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(width: 1.0, color: Colors.black12),
+        bottom: BorderSide(width: 1.0, color: Colors.black12),
+      ),
+    ),
+    width: MediaQuery.of(context).size.width,
+    child: Container(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                "Comments",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black54),
+              ),
+              Text(
+                "View All",
+                style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                textAlign: TextAlign.end,
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          TextField(
+            decoration: InputDecoration(
+              hintText: 'Enter your comment',
+            ),
+            onChanged: (value) {},
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Container(
+            color: Colors.amberAccent,
+            width: double.infinity,
+            child: FlatButton(
+              onPressed: () {
+                // print('click');
+                CollectionReference collectionReference =
+                    Firestore.instance.collection('comments');
+                collectionReference.add({
+                  'user_id': '2345',
+                  'product_id': '45678',
+                  'comment': 'first comment'
+                }).then((value) => print(value.documentID));
+              },
+              child: Text(
+                'Send',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          StreamBuilder(
+              stream: Firestore.instance.collection('comments').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Text('no data');
+                }
+                return ListView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    // scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot comment = snapshot.data.documents[index];
+                      print("comments: ${snapshot.data.documents.length}");
+                      return Container(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(
+                              child: Divider(
+                                color: Colors.black26,
+                                height: 4,
+                              ),
+                              height: 24,
+                            ),
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                              ),
+                              subtitle: Text(comment['comment']),
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  // StarRating(rating: 4, size: 15),
+                                  Text('Saeed Anwar'),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(
+                                    "12 Sep 2019",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
+              }),
+          Container(
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  child: Divider(
+                    color: Colors.black26,
+                    height: 4,
+                  ),
+                  height: 24,
+                ),
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                  ),
+                  subtitle: Text(
+                      "Cats are good pets, for they are clean and are not noisy."),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      // StarRating(rating: 4, size: 15),
+                      Text('Saeed Anwar'),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "12 Sep 2019",
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  child: Divider(
+                    color: Colors.black26,
+                    height: 4,
+                  ),
+                  height: 24,
+                ),
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                        "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                  ),
+                  subtitle: Text(
+                      "Cats are good pets, for they are clean and are not noisy."),
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      // StarRating(rating: 4, size: 15),
+                      Text('Saeed Anwar'),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        "12 Sep 2019",
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // SizedBox(
+          //   child: Divider(
+          //     color: Colors.black26,
+          //     height: 4,
+          //   ),
+          //   height: 24,
+          // ),
+          // ListTile(
+          //   leading: CircleAvatar(
+          //     backgroundImage: NetworkImage(
+          //         "https://www.familiadejesusperu.org/images/avatar/john-doe-13.jpg"),
+          //   ),
+          //   subtitle: Text(
+          //       "There was no ice cream in the freezer, nor did they have money to go to the store."),
+          //   title: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: <Widget>[
+          //       StarRating(rating: 4, size: 15),
+          //       SizedBox(
+          //         width: 8,
+          //       ),
+          //       Text(
+          //         "15 Sep 2019",
+          //         style: TextStyle(fontSize: 12, color: Colors.black54),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // SizedBox(
+          //   child: Divider(
+          //     color: Colors.black26,
+          //     height: 4,
+          //   ),
+          //   height: 24,
+          // ),
+          // ListTile(
+          //   leading: CircleAvatar(
+          //     backgroundImage: NetworkImage(
+          //         "https://pbs.twimg.com/profile_images/1020903668240052225/_6uVaH4c.jpg"),
+          //   ),
+          //   subtitle: Text(
+          //       "I think I will buy the red car, or I will lease the blue one."),
+          //   title: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: <Widget>[
+          //       StarRating(rating: 4, size: 15),
+          //       SizedBox(
+          //         width: 8,
+          //       ),
+          //       Text(
+          //         "25 Sep 2019",
+          //         style: TextStyle(fontSize: 12, color: Colors.black54),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        ],
+      ),
+    ),
+  );
+}
+
+_buildProducts(BuildContext context) {
+  return Column(
+    children: <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                "Similar Items",
+                style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54),
+                textAlign: TextAlign.start,
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  print("Clicked");
+                },
+                child: Text(
+                  "View All",
+                  style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      buildTrending()
+    ],
+  );
+}
+
+Column buildTrending() {
+  return Column(
+    children: <Widget>[
+      Container(
+        height: 242,
+        child: StreamBuilder(
+            stream: Firestore.instance.collection('mobiles').snapshots(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (!snapshot.hasData) {
+                return Text('no data');
+              }
+              return ListView.builder(
+                  itemCount: snapshot.data.documents.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot mobile = snapshot.data.documents[index];
+                    return TrendingItem(
+                      product: Product(
+                          company: mobile['brand'],
+                          name: mobile['product_name'],
+                          icon: mobile['product_image'],
+                          rating: 4.5,
+                          remainingQuantity: 5,
+                          price: 'Rs ${mobile['price']}',
+                          mobile: mobile),
+                      gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
+                    );
+                  });
+            }),
+      )
+    ],
+  );
 }
