@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:provider/provider.dart';
@@ -30,9 +31,11 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
     return isSaved
         ? InkWell(
             onTap: () {
+              print('delete tap ${widget.mobile.documentID}');
               Firestore.instance
                   .collection('favorites')
-                  .where('product_id', isEqualTo: widget.mobile.documentID)
+                  .where('product_name',
+                      isEqualTo: widget.mobile.data['product_name'])
                   .snapshots()
                   .listen((snapshot) {
                 snapshot.documents.forEach((doc) {
@@ -59,7 +62,7 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
               CollectionReference collectionReference =
                   Firestore.instance.collection('favorites');
               collectionReference.add({
-                'user_id': '2345',
+                'user_id': AppData.activeUserId,
                 'product_id': widget.mobile.documentID,
                 'product_name': word,
               }).then((value) => print(value.documentID));

@@ -57,6 +57,8 @@ class _PageSearchResultState extends State<PageSearchResult>
   @override
   void initState() {
     super.initState();
+    print('mobiles in list:${AppData.mobilesList.length}');
+    print('slam');
     tabList = [
       Tab(
           child:
@@ -98,6 +100,7 @@ class _PageSearchResultState extends State<PageSearchResult>
         TextEditingController(text: PageSearchResult.searchWord.toString());
     // initiateSearch(PageSearchResult.searchWord.toString());
     print(PageSearchResult.searchWord.toString());
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(

@@ -594,7 +594,9 @@ class comparisonWidget extends StatelessWidget {
                       child: Container(
                         width: MediaQuery.of(context).size.width / 2,
                         child: Text(
-                          compareList[index][feature],
+                          compareList[index][feature] != null
+                              ? compareList[index][feature]
+                              : '?',
                           style: TextStyle(fontSize: 18),
                         ),
                       ),

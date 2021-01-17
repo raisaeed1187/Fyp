@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutterfirebase/ui/widgets/product_card.dart';
 import 'package:getflutter/components/search_bar/gf_search_bar.dart';
-import 'package:page_transition/page_transition.dart';
+// import 'package:page_transition/page_transition.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class ProductList extends StatefulWidget {
@@ -99,7 +99,7 @@ class _ProductListState extends State<ProductList> {
                 hintStyle: TextStyle(
                     color: Color(0x40515C6F), fontFamily: 'NeusaNextPro'),
                 hintText: "Search Mobiles"),
-            searchList: AppData.mobilesList,
+            searchList: AppData.filterMobiles,
             searchQueryBuilder: (query, list) {
               return list
                   .where((item) => item['product_name']
@@ -107,6 +107,7 @@ class _ProductListState extends State<ProductList> {
                       .contains(query.toLowerCase()))
                   .toList();
             },
+            noItemsFoundWidget: Text('No record found s'),
             hideSearchBoxWhenItemSelected: false,
             overlaySearchListItemBuilder: (item) {
               return Container(
@@ -118,8 +119,10 @@ class _ProductListState extends State<ProductList> {
               );
             },
             onItemSelected: (item) {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProductDetails(mobile: item)));
+              if (item != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ProductDetails(mobile: item)));
+              }
             },
           ),
         ),

@@ -4,10 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutterfirebase/PageSearch.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/modal/user.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/services/auth.dart';
+import 'package:flutterfirebase/services/database.dart';
 import 'package:flutterfirebase/services/favorite_services.dart';
+import 'package:flutterfirebase/services/search_service.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/painters/circlepainters.dart';
 import 'package:flutterfirebase/ui/screens/favorites_list.dart';
@@ -17,18 +22,22 @@ import 'package:flutterfirebase/ui/screens/shoppingcart.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
 import 'package:flutterfirebase/ui/screens/whell.dart';
 import 'package:flutterfirebase/ui/utils/constant.dart';
+import 'package:flutterfirebase/ui/widgets/bannerWidget.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
+import 'package:flutterfirebase/ui/widgets/leftDrawer.dart';
 import 'package:flutterfirebase/ui/widgets/occasions.dart';
-import 'package:flutterfirebase/ui/utils/navigator.dart';
-import 'package:page_transition/page_transition.dart';
+// import 'package:flutterfirebase/ui/utils/navigator.dart';
+// import 'package:page_transition/page_transition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
-import 'checkout.dart';
+// import 'checkout.dart';
 import 'products_list.dart';
 import 'usersettings.dart';
-import 'dart:async';
+// import 'dart:async';
 
 class Home extends StatefulWidget {
+  final String uid;
+  Home({this.uid});
   @override
   _HomeState createState() => _HomeState();
 }
@@ -57,157 +66,178 @@ class _HomeState extends State<Home> {
     super.initState();
   }
 
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        key: _scaffoldKey,
-        drawer: Drawer(child: leftDrawerMenu()),
-        appBar: buildAppBar(context),
-        bottomNavigationBar: new TabBar(
-          tabs: [
-            Tab(
-              icon: new Icon(Icons.home),
-            ),
-            Tab(
-              icon: new Icon(Icons.search),
-            ),
-            Tab(
-              icon: new Icon(Icons.shopping_cart),
-            ),
-            Tab(
-              icon: new Icon(Icons.account_circle),
-            )
-          ],
-          labelColor: Theme.of(context).primaryColor,
-          unselectedLabelColor: Colors.blueGrey,
-          indicatorSize: TabBarIndicatorSize.label,
-          indicatorPadding: EdgeInsets.all(8.0),
-          indicatorColor: Colors.red,
-        ),
-        body: TabBarView(
-          children: [
-            Container(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    CategoriesListView(
-                      title: "YOUR TITLES",
-                      categories: [
-                        'menu.png',
-                        'iphone_logo-2.png',
-                        'samsung_logo.jpg',
-                        'oppo_logo-2.png',
-                        'telephone.png',
-                        'telephone.png',
-                        'telephone.png',
-                        'telephone.png'
-                      ],
-                      categoryTitle: [
-                        'All',
-                        'Iphone',
-                        'Samsung',
-                        'Oppo',
-                        'Infinix',
-                        'Real Me',
-                        'TechNo',
-                        'Vivo'
-                      ],
-                    ),
-                    buildCarouselSlider(),
-                    SizedBox(
-                      height: 5.0,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              "Popular Trendings",
-                              style: TextStyle(
-                                  fontSize: 20.0, fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  PageTransition(
-                                    type: PageTransitionType.fade,
-                                    child: ProductList(
-                                      mobilesList: AppData.mobilesList,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                "View All",
-                                style: TextStyle(
-                                    fontSize: 18.0, color: Colors.blue),
-                                textAlign: TextAlign.end,
-                              ),
-                            ),
-                          ),
+    // final userData = Provider.of<UserData>(context);
+    // print(userData);
+    return StreamProvider<UserData>.value(
+      value: DatabaseService(uid: AppData.activeUserId).getUserData,
+      child: DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          key: _scaffoldKey,
+          drawer: Drawer(child: leftDrawerMenu()),
+          appBar: buildAppBar(context),
+          bottomNavigationBar: new TabBar(
+            tabs: [
+              Tab(
+                icon: new Icon(Icons.home),
+              ),
+              Tab(
+                icon: new Icon(Icons.search),
+              ),
+              Tab(
+                icon: new Icon(Icons.shopping_cart),
+              ),
+              Tab(
+                icon: new Icon(Icons.account_circle),
+              )
+            ],
+            labelColor: Theme.of(context).primaryColor,
+            unselectedLabelColor: Colors.blueGrey,
+            indicatorSize: TabBarIndicatorSize.label,
+            indicatorPadding: EdgeInsets.all(8.0),
+            indicatorColor: Colors.red,
+          ),
+          body: TabBarView(
+            children: [
+              Container(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      CategoriesListView(
+                        title: "YOUR TITLES",
+                        categories: [
+                          'menu.png',
+                          'iphone_logo-2.png',
+                          'samsung_logo.jpg',
+                          'oppo_logo-2.png',
+                          'telephone.png',
+                          'telephone.png',
+                          'telephone.png',
+                          'telephone.png',
+                          'telephone.png',
+                          'telephone.png'
+                        ],
+                        categoryTitle: [
+                          'All',
+                          'Apple',
+                          'Samsung',
+                          'Oppo',
+                          'Infinix',
+                          'Realme',
+                          'Techno',
+                          'Vivo',
+                          'Huawei',
+                          'Xiaomi'
                         ],
                       ),
-                    ),
-                    buildTrending(),
-                    Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Text(
-                              "Best Selling",
-                              style: TextStyle(
-                                  fontSize: 20.0, fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                print("Clicked");
-                              },
+                      StreamProvider<QuerySnapshot>.value(
+                          value: banners, child: buildCarouselSlider()),
+                      SizedBox(
+                        height: 5.0,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
                               child: Text(
-                                "View All",
+                                "Latest",
                                 style: TextStyle(
-                                    fontSize: 18.0, color: Colors.blue),
-                                textAlign: TextAlign.end,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.start,
                               ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => ProductList(
+                                            mobilesList: AppData.mobilesList,
+                                          )));
+                                  // Navigator.push(
+                                  //   context,
+                                  //   PageTransition(
+                                  //     type: PageTransitionType.fade,
+                                  //     child: ProductList(
+                                  //       mobilesList: AppData.mobilesList,
+                                  //     ),
+                                  //   ),
+                                  // );
+                                },
+                                child: Text(
+                                  "View All",
+                                  style: TextStyle(
+                                      fontSize: 18.0, color: Colors.blue),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    buildTrending(),
-                    Occasions(),
-                    Occasions(),
-                  ],
+                      buildLatest(),
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                "Best Selling",
+                                style: TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  print("Clicked");
+                                },
+                                child: Text(
+                                  "View All",
+                                  style: TextStyle(
+                                      fontSize: 18.0, color: Colors.blue),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      buildTrending(),
+                      Occasions(),
+                      // Occasions(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            WhellFortune(),
-            ShoppingCart(false),
-            UserSettings(),
-          ],
+              PageSearch(),
+              ShoppingCart(false),
+              UserSettings(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Column buildTrending() {
+  Column buildLatest() {
     return Column(
       children: <Widget>[
         Container(
           height: 242,
           child: StreamBuilder(
-              stream: Firestore.instance.collection('mobiles').snapshots(),
+              stream: Firestore.instance
+                  .collection('mobiles')
+                  .orderBy('released_date', descending: true)
+                  .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -224,7 +254,7 @@ class _HomeState extends State<Home> {
                             name: mobile['product_name'],
                             productId: mobile.documentID,
                             icon: mobile['product_image'],
-                            rating: 4.5,
+                            rating: 3.5,
                             remainingQuantity: 5,
                             price: 'Rs ${mobile['price']}',
                             mobile: mobile),
@@ -237,56 +267,16 @@ class _HomeState extends State<Home> {
     );
   }
 
-  CarouselSlider buildCarouselSlider() {
-    return CarouselSlider(
-      height: 150,
-      viewportFraction: 0.9,
-      aspectRatio: 16 / 9,
-      autoPlay: true,
-      enlargeCenterPage: true,
-      items: imgList.map(
-        (url) {
-          return Stack(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.all(5.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    width: 1000.0,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        "Sunny Getaways",
-                        style: TextStyle(color: Colors.white, fontSize: 24),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                            "Lorem Ipsım Dolar Lorem Ipsım Dolar Lorem Ipsım Dolar",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 14)),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          );
-        },
-      ).toList(),
-    );
-  }
+  // CarouselSlider buildCarouselSlider() {
+  //   return CarouselSlider(
+  //     height: 150,
+  //     viewportFraction: 0.9,
+  //     aspectRatio: 16 / 9,
+  //     autoPlay: true,
+  //     enlargeCenterPage: true,
+  //     items: StreamBuilder()
+  //   );
+  // }
 
   BottomNavyBar buildBottomNavyBar(BuildContext context) {
     return BottomNavyBar(
@@ -328,21 +318,23 @@ class _HomeState extends State<Home> {
               color: Colors.black),
           onPressed: () => _scaffoldKey.currentState.openDrawer()),
       actions: <Widget>[
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: Search(),
-              ),
-            );
-          },
-          child: Icon(
-            MaterialCommunityIcons.getIconData("magnify"),
-            color: Colors.black,
-          ),
-        ),
+        // GestureDetector(
+        //   onTap: () {
+        //     Navigator.of(context)
+        //         .push(MaterialPageRoute(builder: (context) => Search()));
+        //     // Navigator.push(
+        //     //   context,
+        //     //   PageTransition(
+        //     //     type: PageTransitionType.fade,
+        //     //     child: Search(),
+        //     //   ),
+        //     // );
+        //   },
+        //   child: Icon(
+        //     MaterialCommunityIcons.getIconData("magnify"),
+        //     color: Colors.black,
+        //   ),
+        // ),
         IconButton(
           icon: Icon(
             // MaterialCommunityIcons.getIconData("cart-outline"),
@@ -350,206 +342,21 @@ class _HomeState extends State<Home> {
           ),
           color: Colors.black,
           onPressed: () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: ShoppingCart(true),
-              ),
-            );
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => ProductList(
+                      mobilesList: AppData.mobilesList,
+                    )));
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: ShoppingCart(true),
+            //   ),
+            // );
           },
         ),
       ],
       backgroundColor: Colors.white,
-    );
-  }
-
-  leftDrawerMenu() {
-    Color blackColor = Colors.black.withOpacity(0.6);
-    return Container(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            height: 150,
-            child: DrawerHeader(
-              child: ListTile(
-                trailing: Icon(
-                  Icons.chevron_right,
-                  size: 28,
-                ),
-                subtitle: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.fade,
-                        child: UserSettings(),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    "See Profile",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: blackColor),
-                  ),
-                ),
-                title: Text(
-                  "Saeed Anwar",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: blackColor),
-                ),
-                leading: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/me1.jpg'),
-                  // backgroundImage: NetworkImage(
-                  //     "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
-                ),
-              ),
-              decoration: BoxDecoration(
-                color: Color(0xFFF8FAFB),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              Feather.getIconData('home'),
-              color: blackColor,
-            ),
-            title: Text(
-              'Home',
-              style: TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.w600, color: blackColor),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: Home(),
-                ),
-              );
-            },
-          ),
-          StreamProvider<QuerySnapshot>.value(
-            value: allFavoriteQuery,
-            child: Container(
-              child: AllFavoritesWidget(),
-            ),
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('search'), color: blackColor),
-            title: Text('Search',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: Search(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            trailing: Icon(
-              Ionicons.getIconData('ios-radio-button-on'),
-              color: Color(0xFFFB7C7A),
-              size: 18,
-            ),
-            leading: Icon(Feather.getIconData('bell'), color: blackColor),
-            title: Text('Notifications',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, Checkout());
-            },
-          ),
-          ListTile(
-            trailing: Icon(
-              Icons.looks_two,
-              color: Color(0xFFFB7C7A),
-              size: 18,
-            ),
-            leading: Icon(Icons.compare_arrows, color: blackColor),
-            title: Text('Previous Comparison',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: ShoppingCart(true),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading:
-                Icon(Feather.getIconData('message-circle'), color: blackColor),
-            title: Text('Support',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, ProductList());
-            },
-          ),
-          ListTile(
-            leading:
-                Icon(Feather.getIconData('help-circle'), color: blackColor),
-            title: Text('Help',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, UserSettings());
-            },
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('settings'), color: blackColor),
-            title: Text('Settings',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                  type: PageTransitionType.fade,
-                  child: UserSettings(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('x-circle'), color: blackColor),
-            title: Text('Quit',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              SystemChannels.platform.invokeMethod('SystemNavigator.pop');
-            },
-          ),
-        ],
-      ),
     );
   }
 
@@ -640,31 +447,53 @@ class _HomeState extends State<Home> {
           ),
           InkWell(
             onTap: () {
+              print("total compare ${AppData.compareList.length.toString()}");
               showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    AppData.compareList.add(mobile);
-                    return AlertDialog(
-                      title: Row(
-                        children: <Widget>[
-                          Text('Mobiles in Compare list '),
-                          Text(AppData.compareList.length.toString()),
-                        ],
-                      ),
-                      content: FlatButton(
-                        onPressed: () {
-                          List<DocumentSnapshot> list = AppData.compareList;
+                    if (AppData.compareList.length <= 4) {
+                      AppData.compareList.add(mobile);
+                      return AlertDialog(
+                        title: Row(
+                          children: <Widget>[
+                            Text('Mobiles in Compare list '),
+                            Text(AppData.compareList.length.toString()),
+                          ],
+                        ),
+                        content: FlatButton(
+                          onPressed: () async {
+                            List<DocumentSnapshot> list = AppData.compareList;
+                            AppData.compareList.clear();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => Comparison(
+                                  compareList: list,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text('Compare Now'),
+                          color: Colors.green,
+                        ),
+                      );
+                    } else {
+                      return AlertDialog(
+                        title: Row(
+                          children: <Widget>[
+                            Text('you Compare more then 4 mobiles '),
+                          ],
+                        ),
+                        content: FlatButton(
+                          onPressed: () {
+                            // List<DocumentSnapshot> list = AppData.compareList;
 
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => Comparison(
-                                    compareList: list,
-                                  )));
-                          // AppData.compareList.clear();
-                        },
-                        child: Text('Compare Now'),
-                        color: Colors.green,
-                      ),
-                    );
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Go back'),
+                          color: Colors.green,
+                        ),
+                      );
+                    }
                   });
             },
             child: Container(
@@ -699,16 +528,19 @@ class CategoriesListView extends StatelessWidget {
   final String title;
   final List<String> categories;
   final List<String> categoryTitle;
-
-  const CategoriesListView(
+  CategoriesListView(
       {Key key,
       @required this.title,
       @required this.categories,
       @required this.categoryTitle})
       : super(key: key);
+  QuerySnapshot document;
+  List<DocumentSnapshot> doc;
 
   @override
   Widget build(BuildContext context) {
+    print(categoryTitle[1]);
+
     return CustomPaint(
       painter: LinePainter(),
       child: Column(
@@ -721,16 +553,30 @@ class CategoriesListView extends StatelessWidget {
               itemCount: categories.length,
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.fade,
-                        child: ProductList(
-                          mobilesList: AppData.mobilesList,
-                        ),
-                      ),
-                    );
+                  onTap: () async {
+                    if (categoryTitle[index] == 'All') {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ProductList(
+                                mobilesList: AppData.mobilesList,
+                              )));
+                    } else {
+                      document = await SearchService()
+                          .searchBrand(categoryTitle[index]);
+                      doc = document.documents;
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ProductList(
+                                mobilesList: doc,
+                              )));
+                    }
+                    // Navigator.push(
+                    //   context,
+                    //   PageTransition(
+                    //     type: PageTransitionType.fade,
+                    //     child: ProductList(
+                    //       mobilesList: AppData.mobilesList,
+                    //     ),
+                    //   ),
+                    // );
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -830,15 +676,19 @@ class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
               fontWeight: FontWeight.w600,
               color: Colors.black54)),
       onTap: () {
-        Navigator.push(
-          context,
-          PageTransition(
-            type: PageTransitionType.fade,
-            child: FavoriteList(
-              mobilesList: AppData.favoriteMobiles,
-            ),
-          ),
-        );
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => FavoriteList(
+                  mobilesList: AppData.favoriteMobiles,
+                )));
+        // Navigator.push(
+        //   context,
+        //   PageTransition(
+        //     type: PageTransitionType.fade,
+        //     child: FavoriteList(
+        //       mobilesList: AppData.favoriteMobiles,
+        //     ),
+        //   ),
+        // );
       },
     );
   }

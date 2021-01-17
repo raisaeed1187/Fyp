@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfirebase/favorite/main.dart';
+import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
@@ -9,6 +10,8 @@ import 'package:flutterfirebase/ui/widgets/star_rating.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
+// import 'dart:html';
 
 class ProductDetails extends StatefulWidget {
   DocumentSnapshot mobile;
@@ -258,15 +261,122 @@ class _ProductDetailsState extends State<ProductDetails> {
                           ),
                         ),
                         decoration: BoxDecoration(
-                          border: Border(
-//                        bottom: BorderSide(color: Colors.black, width: 3.0),
-                              ),
-                          color: Colors.amberAccent,
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          color: Color(0xFFE7F9F5),
+                          border: Border.all(
+                            color: Color(0xFF4CD7A5),
+                          ),
                         ),
+                      ),
+                      StreamBuilder(
+                        stream: Firestore.instance
+                            .collection('AffiliteLinks')
+                            .where('product_name',
+                                isEqualTo: mobile['product_name'])
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Text('no data');
+                          }
+                          // snapshot.data.documents.
+                          return Column(
+                            children: snapshot.data.documents
+                                .map<Widget>(
+                                  (doc) => Container(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 16, left: 16, right: 16),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Container(
+                                                margin:
+                                                    EdgeInsets.only(bottom: 10),
+                                                child: Text(
+                                                  doc['retailer'],
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                "Rs ${mobile['price']}",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black54),
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            child: Row(
+                                              children: [
+                                                StarRating(
+                                                  rating: 3.5,
+                                                  size: 20,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('Free Shipping'),
+                                                  Text('2-3 Business Days')
+                                                ],
+                                              ),
+                                              FlatButton(
+                                                onPressed: () {
+                                                  String url = doc['link'];
+                                                  launch(url);
+                                                },
+                                                padding:
+                                                    EdgeInsets.only(left: 10),
+                                                child: Container(
+                                                  width: 100,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.deepOrange,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                  ),
+                                                  child: Center(
+                                                      child: Text(
+                                                    'Shop Now',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  )),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Divider(
+                                            height: 20,
+                                            color: Colors.black,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        },
                       ),
                       Container(
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Column(
                             children: [
                               Row(
@@ -280,38 +390,25 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.black54,
                                       ),
                                     ),
                                   ),
                                   Text(
                                     "Rs ${mobile['price']}",
                                     style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black54,
+                                    ),
                                   ),
                                 ],
                               ),
                               Container(
                                 child: Row(
                                   children: [
-                                    Icon(
-                                      Icons.star,
-                                      size: 20,
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 20,
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 20,
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 20,
-                                    ),
-                                    Icon(
-                                      Icons.star,
+                                    StarRating(
+                                      rating: 3.5,
                                       size: 20,
                                     ),
                                   ],
@@ -335,6 +432,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           "https://www.amazon.com/gp/product/B07YQ58NPF/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B07YQ58NPF&linkCode=as2&tag=raisaeedanwar-20&linkId=f27148cc04cec6c7cf38e38876a147f4";
                                       launch(url);
                                     },
+                                    padding: EdgeInsets.only(left: 1),
                                     child: Container(
                                       width: 100,
                                       height: 40,
@@ -389,178 +487,195 @@ class _ProductDetailsState extends State<ProductDetails> {
                           ),
                         ),
                         decoration: BoxDecoration(
-                          border: Border(
-//                        bottom: BorderSide(color: Colors.black, width: 3.0),
-                              ),
-                          color: Colors.amberAccent,
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          color: Color(0xFFE7F9F5),
+                          border: Border.all(
+                            color: Color(0xFF4CD7A5),
+                          ),
                         ),
                       ),
-                      Column(
-                        children: [
-                          InkWell(
-                            onTap: showAdvantageWidget,
-                            child: Container(
-                              width: double.infinity,
-                              height: 50.0,
-                              decoration: BoxDecoration(
-                                color: Colors.amberAccent[100],
-                                border: Border(
-                                  bottom: BorderSide(
-                                      width: 1.0, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap: showAdvantageWidget,
+                              child: Container(
+                                width: double.infinity,
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8.0)),
+                                  color: Color(0xFFE7F9F0),
+                                  border: Border.all(
+                                    color: Color(0xFF4CD7A5),
+                                  ),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Advantages',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18.0,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Advantages',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18.0,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Icon(disadvantage
-                                        ? Icons.keyboard_arrow_up
-                                        : Icons.keyboard_arrow_down),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(advantage
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          ),
-                          Visibility(
-                            maintainSize: false,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            visible: advantage,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                color: Colors.blueGrey[100],
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Visibility(
+                              maintainSize: false,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              visible: advantage,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    color: Color(0xFFF5F8FB),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
 //                          mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      advantageWidget(
-                                        type: 'Has Responsive Touch Screen',
-                                        value: 'Capacitive, MultiTouch',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Quite Big Screen',
-                                        value: '6.53 in',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Sharp Screen',
-                                        value: '~395 PPI',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Octa Core CPU',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Lots of Storage Capacity',
-                                        value: '64 GB',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Faster CPU',
-                                        value: '2 GHz',
-                                      ),
-                                      advantageWidget(
-                                        type: 'Lots Of RAM',
-                                        value: '4 GB',
-                                      ),
-                                    ],
+                                      children: [
+                                        advantageWidget(
+                                          type: 'Has Responsive Touch Screen',
+                                          value: 'Capacitive, MultiTouch',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Quite Big Screen',
+                                          value: '6.53 in',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Sharp Screen',
+                                          value: '~395 PPI',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Octa Core CPU',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Lots of Storage Capacity',
+                                          value: '64 GB',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Faster CPU',
+                                          value: '2 GHz',
+                                        ),
+                                        advantageWidget(
+                                          type: 'Lots Of RAM',
+                                          value: '4 GB',
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                      Column(
-                        children: [
-                          InkWell(
-                            onTap: showDisadvantageWidget,
-                            child: Container(
-                              width: double.infinity,
-                              height: 50.0,
-                              decoration: BoxDecoration(
-                                color: Colors.amberAccent[100],
-                                border: Border(
-                                  bottom: BorderSide(
-                                      width: 1.0, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap: showDisadvantageWidget,
+                              child: Container(
+                                width: double.infinity,
+                                height: 40.0,
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8.0)),
+                                  color: Color(0xFFFF7069),
+                                  border: Border.all(
+                                    color: Colors.red[400],
+                                  ),
                                 ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Disadvantages',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18.0,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Disadvantages',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 18.0,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Icon(disadvantage
-                                        ? Icons.keyboard_arrow_up
-                                        : Icons.keyboard_arrow_down),
-                                  ),
-                                ],
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Icon(disadvantage
+                                          ? Icons.keyboard_arrow_up
+                                          : Icons.keyboard_arrow_down),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 5.0,
-                          ),
-                          Visibility(
-                            maintainSize: false,
-                            maintainAnimation: true,
-                            maintainState: true,
-                            visible: disadvantage,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                color: Colors.blueGrey[100],
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Visibility(
+                              maintainSize: false,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              visible: disadvantage,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    color: Color(0xFFF5F8FB),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
 //                          mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      advantageWidget(
-                                        type: 'Heavy Weight',
-                                        value: '198 g',
-                                      ),
-                                    ],
+                                      children: [
+                                        advantageWidget(
+                                          type: 'Heavy Weight',
+                                          value: '198 g',
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Column(
                         children: [
@@ -568,10 +683,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                             width: double.infinity,
                             height: 50.0,
                             decoration: BoxDecoration(
-                              color: Colors.amberAccent,
-                              border: Border(
-                                bottom:
-                                    BorderSide(width: 1.0, color: Colors.black),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                              color: Color(0xFFE7F9F0),
+                              border: Border.all(
+                                color: Color(0xFF4CD7A5),
                               ),
                             ),
                             child: Align(
@@ -598,10 +714,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F0),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -638,7 +755,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   visible: general,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.blueGrey[100],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
                                     ),
                                     child: Column(
                                       children: [
@@ -688,10 +807,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Align(
@@ -728,7 +848,9 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   visible: design,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.blueGrey[100],
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
                                     ),
                                     child: Column(
                                       children: [
@@ -761,10 +883,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -801,7 +924,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   visible: display,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Colors.blueGrey[100]),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
+                                    ),
                                     child: Column(
                                       children: [
                                         buildSigleDetail('Type',
@@ -851,10 +977,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -891,7 +1018,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   visible: memory,
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Colors.blueGrey[100]),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
+                                    ),
                                     child: Column(
                                       children: [
                                         buildSigleDetail('RAM', mobile['ram']),
@@ -928,10 +1058,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -967,7 +1098,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   maintainState: true,
                                   visible: camera,
                                   child: Container(
-                                    color: Colors.blueGrey[100],
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
+                                    ),
                                     child: Column(
                                       children: [
                                         buildSigleDetail('Rear Camera',
@@ -1011,10 +1146,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -1050,7 +1186,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   maintainState: true,
                                   visible: battery,
                                   child: Container(
-                                    color: Colors.blueGrey[100],
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
+                                    ),
                                     child: Column(
                                       children: [
                                         buildSigleDetail(
@@ -1100,10 +1240,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     width: double.infinity,
                                     height: 40.0,
                                     decoration: BoxDecoration(
-                                      color: Colors.amberAccent[100],
-                                      border: Border(
-                                        bottom: BorderSide(
-                                            width: 1.0, color: Colors.black),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFE7F9F5),
+                                      border: Border.all(
+                                        color: Color(0xFF4CD7A5),
                                       ),
                                     ),
                                     child: Row(
@@ -1139,7 +1280,11 @@ class _ProductDetailsState extends State<ProductDetails> {
                                   maintainState: true,
                                   visible: extra,
                                   child: Container(
-                                    color: Colors.blueGrey[100],
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      color: Color(0xFFF5F8FB),
+                                    ),
                                     child: Column(
                                       children: [
                                         buildSigleDetail('GPS',
@@ -1179,7 +1324,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 ),
                 // _buildComments(context),
                 BuildComments(
-                  mobID: mobile.documentID,
+                  mobName: mobile['product_name'],
                 ),
                 _buildProducts(context),
               ],
@@ -1243,19 +1388,21 @@ class advantageWidget extends StatelessWidget {
 }
 
 class BuildComments extends StatefulWidget {
-  String mobID;
-  BuildComments({this.mobID});
+  String mobName;
+  BuildComments({this.mobName});
   @override
-  _BuildCommentsState createState() => _BuildCommentsState(this.mobID);
+  _BuildCommentsState createState() => _BuildCommentsState(this.mobName);
 }
 
 class _BuildCommentsState extends State<BuildComments> {
   final commentController = TextEditingController();
-  String mobID;
-  _BuildCommentsState(this.mobID);
+  String mobName;
+  _BuildCommentsState(this.mobName);
   String comment;
+  double rating = 5.0;
   @override
   Widget build(BuildContext context) {
+    print("active user: ${AppData.activeUserName}");
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -1278,11 +1425,31 @@ class _BuildCommentsState extends State<BuildComments> {
                       fontWeight: FontWeight.w500,
                       color: Colors.black54),
                 ),
-                Text(
-                  "View All",
-                  style: TextStyle(fontSize: 18.0, color: Colors.blue),
-                  textAlign: TextAlign.end,
-                ),
+                SmoothStarRating(
+                    allowHalfRating: true,
+                    onRated: (v) {
+                      setState(() {
+                        setState(() {
+                          rating = v;
+                        });
+                      });
+                      print('you rate: $rating');
+                    },
+                    starCount: 5,
+                    rating: 5,
+                    size: 20.0,
+                    // isReadOnly:true,
+                    // fullRatedIconData: Icons.blur_off,
+                    // halfRatedIconData: Icons.blur_on,
+                    color: Colors.yellow,
+                    borderColor: Colors.yellow,
+                    spacing: 0.0)
+
+                // Text(
+                //   "View All",
+                //   style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                //   textAlign: TextAlign.end,
+                // ),
               ],
             ),
             SizedBox(height: 12),
@@ -1310,11 +1477,12 @@ class _BuildCommentsState extends State<BuildComments> {
                   CollectionReference collectionReference =
                       Firestore.instance.collection('comments');
                   collectionReference.add({
-                    'user_id': '2345',
-                    'user_name': 'Saeed Anwar',
-                    'user_image': '',
-                    'product_id': mobID,
+                    'user_id': AppData.activeUserId,
+                    'user_name': AppData.activeUserName,
+                    'user_image': 'img',
+                    'product_name': mobName,
                     'comment': comment,
+                    'rating': rating,
                     'date_time': now,
                   }).then((value) => print(value.documentID));
                   commentController.clear();
@@ -1331,7 +1499,7 @@ class _BuildCommentsState extends State<BuildComments> {
             StreamBuilder(
               stream: Firestore.instance
                   .collection('comments')
-                  .where('product_id', isEqualTo: mobID)
+                  .where('product_name', isEqualTo: mobName)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -1360,11 +1528,16 @@ class _BuildCommentsState extends State<BuildComments> {
                                 backgroundImage: NetworkImage(
                                     "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
                               ),
-                              subtitle: Text(comment['comment']),
+                              subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    StarRating(
+                                        rating: comment['rating'], size: 15),
+                                    Text(comment['comment'])
+                                  ]),
                               title: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  // StarRating(rating: 4, size: 15),
                                   Text(comment['user_name']),
                                   SizedBox(
                                     width: 8,

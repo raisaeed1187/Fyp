@@ -50,8 +50,8 @@ class _ComparisonState extends State<Comparison> {
   }
 
   void getScore() {
-    for (int i = 0; i < compareList.length; i++) {
-      if (i == compareList.length - 1) {
+    for (int i = 0; i < this.compareList.length; i++) {
+      if (i == this.compareList.length - 1) {
         break;
       }
       if (getCamera(i) > getCamera(i + 1)) {
@@ -104,8 +104,8 @@ class _ComparisonState extends State<Comparison> {
           mobilesScore[i] = mobilesScore[j];
           mobilesScore[j] = scoreTemp;
           // ---------------------
-          mobTemp = compareList[i];
-          compareList[i] = compareList[j];
+          mobTemp = this.compareList[i];
+          this.compareList[i] = this.compareList[j];
           compareList[j] = mobTemp;
         }
       }
@@ -117,7 +117,8 @@ class _ComparisonState extends State<Comparison> {
     super.initState();
     getScore();
     sortMobile();
-    // print(AppData.compareList.length);
+    // AppData.compareList.clear();
+    print(this.compareList.length);
   }
 
   @override

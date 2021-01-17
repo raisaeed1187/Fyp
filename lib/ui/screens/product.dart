@@ -9,7 +9,7 @@ import 'package:flutterfirebase/ui/utils/colors.dart';
 import 'package:flutterfirebase/ui/widgets/dotted_slider.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
 import 'package:flutterfirebase/ui/widgets/star_rating.dart';
-import 'package:page_transition/page_transition.dart';
+// import 'package:page_transition/page_transition.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ProductPage extends StatefulWidget {
@@ -203,13 +203,15 @@ class _ProductPageState extends State<ProductPage> {
               actions: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.fade,
-                        child: Search(),
-                      ),
-                    );
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => Search()));
+                    // Navigator.push(
+                    //   context,
+                    //   PageTransition(
+                    //     type: PageTransitionType.fade,
+                    //     child: Search(),
+                    //   ),
+                    // );
                   },
                   child: Icon(
                     MaterialCommunityIcons.getIconData("magnify"),
@@ -224,13 +226,15 @@ class _ProductPageState extends State<ProductPage> {
                       ),
                       color: Colors.black,
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageTransition(
-                            type: PageTransitionType.fade,
-                            child: UserSettings(),
-                          ),
-                        );
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UserSettings()));
+                        // Navigator.push(
+                        //   context,
+                        //   PageTransition(
+                        //     type: PageTransitionType.fade,
+                        //     child: UserSettings(),
+                        //   ),
+                        // );
                       },
                     ),
                     isClicked
@@ -354,13 +358,15 @@ class _ProductPageState extends State<ProductPage> {
             "GO CART",
             style: TextStyle(color: Colors.white, fontSize: 20),
           ),
-          onPressed: () => Navigator.push(
-            context,
-            PageTransition(
-              type: PageTransitionType.fade,
-              child: ShoppingCart(true),
-            ),
-          ),
+          onPressed: () {
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: ShoppingCart(true),
+            //   ),
+            // );
+          },
           gradient: LinearGradient(colors: [
             Color.fromRGBO(116, 116, 191, 1.0),
             Color.fromRGBO(52, 138, 199, 1.0)

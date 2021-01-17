@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/ui/screens/accountsettings.dart';
 import 'package:flutterfirebase/ui/screens/checkout.dart';
-import 'package:page_transition/page_transition.dart';
+// import 'package:page_transition/page_transition.dart';
 
 class UserSettings extends StatelessWidget {
   @override
@@ -109,43 +109,43 @@ class Settings extends StatelessWidget {
           // ),
           SettingsItem(Feather.getIconData("settings"), '#FDB78B',
               'Account Settings', 'General ettings for your account', () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: AccountSettings(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: AccountSettings(),
+            //   ),
+            // );
           }),
           SettingsItem(Feather.getIconData("message-circle"), '#606B7E',
               'My Comments', 'Your comments for products', () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: Checkout(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: Checkout(),
+            //   ),
+            // );
           }),
           SettingsItem(Feather.getIconData("bell"), '#FB7C7A', 'Notifications',
               'Notifications in the app', () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: Checkout(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: Checkout(),
+            //   ),
+            // );
           }),
           SettingsItem(Feather.getIconData("help-circle"), '#24ACE9', 'Help',
               'See here for help', () {
-            Navigator.push(
-              context,
-              PageTransition(
-                type: PageTransitionType.fade,
-                child: Checkout(),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   PageTransition(
+            //     type: PageTransitionType.fade,
+            //     child: Checkout(),
+            //   ),
+            // );
           }),
         ],
       ),

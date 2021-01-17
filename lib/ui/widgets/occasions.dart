@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/ui/utils/navigator.dart';
+import 'package:flutterfirebase/ui/widgets/item_product.dart';
 import 'package:flutterfirebase/ui/widgets/star_rating.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
 
@@ -25,7 +27,7 @@ class Occasions extends StatelessWidget {
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: 220,
+        height: 320,
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: Card(
@@ -39,7 +41,7 @@ class Occasions extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        "Mobile Special Offer",
+                        "Popular Comparison",
                         style: TextStyle(
                             fontSize: 18.0, fontWeight: FontWeight.w600),
                         textAlign: TextAlign.start,
@@ -57,90 +59,80 @@ class Occasions extends StatelessWidget {
                       height: 1,
                     ),
                   ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 1, color: Colors.black12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.asset('assets/iphone_x.png',
-                              height: 120,
-                              width: MediaQuery.of(context).size.width / 3),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 24,
-                      ),
-                      Container(
-                        height: 142,
-                        decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 1, color: Colors.black12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                "06 : 43 : 32",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 4.0),
-                                child: Text(
-                                  "Iphone Xs Max",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                ),
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Text(
-                                    "5.365 TL",
-                                    style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                  Container(
+                    height: 240,
+                    child: StreamBuilder(
+                        stream: Firestore.instance
+                            .collection('mobiles')
+                            .orderBy('released_date', descending: true)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Text('no data');
+                          }
+                          return ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: snapshot.data.documents.length,
+                            itemBuilder: (context, index) {
+                              DocumentSnapshot mobile =
+                                  snapshot.data.documents[index];
+
+                              return Card(
+                                child: Container(
+                                  margin: const EdgeInsets.only(right: 8.0),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      TrendingItem(
+                                        product: Product(
+                                            company: mobile['brand'],
+                                            name: mobile['product_name'],
+                                            productId: mobile.documentID,
+                                            icon: mobile['product_image'],
+                                            rating: 4.5,
+                                            remainingQuantity: 5,
+                                            price: 'Rs ${mobile['price']}',
+                                            mobile: mobile),
+                                        gradientColors: [
+                                          Color(0XFFa466ec),
+                                          Colors.purple[400]
+                                        ],
+                                      ),
+                                      Center(
+                                        child: SizedBox(
+                                          width: 24,
+                                          child: Text(
+                                            'vs',
+                                            style: TextStyle(
+                                                fontSize: 22,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      TrendingItem(
+                                        product: Product(
+                                            company: 'Apple',
+                                            name: "iphone 11 pro",
+                                            productId: '115c0xoyPbkXU49tSro2',
+                                            icon:
+                                                'https://www.bestmobile.pk/mobile_images/Original_1601501407Xiaomi-Mi-10T-5G-price-pakistan.jpg',
+                                            rating: 4.5,
+                                            remainingQuantity: 5,
+                                            price: 'Rs 43245',
+                                            mobile: mobile),
+                                        gradientColors: [
+                                          Color(0XFFa466ec),
+                                          Colors.purple[400]
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 6,
-                                  ),
-                                  Text(
-                                    '#6.789',
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 12,
-                                        decoration: TextDecoration.lineThrough),
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: StarRating(rating: 4, size: 10),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text("Free Cargo"),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: Text(
-                                  "Last 11 Item",
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                              );
+                            },
+                          );
+                        }),
                   )
                 ],
               ),

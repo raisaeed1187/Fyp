@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
+import 'package:flutterfirebase/modal/user.dart';
 
 List<FavoriteModal> _favoriteListFromSnapshot(QuerySnapshot snapshot) {
   return snapshot.documents.map((doc) {
@@ -22,6 +23,29 @@ Stream<QuerySnapshot> favoriteMobiles(String name) {
   return mobilesCollection.where('product_name', isEqualTo: name).snapshots();
 }
 
-Stream<QuerySnapshot> get allFavoriteQuery {
-  return favCollection.snapshots();
+Stream<QuerySnapshot> getFavoriteMob(DocumentSnapshot snapshot) {
+  return mobilesCollection
+      .where('product_name', isEqualTo: snapshot.data['product_name'])
+      .snapshots();
+}
+
+Stream<QuerySnapshot> allFavoriteQuery(String id) {
+  return favCollection.where('user_id', isEqualTo: id).snapshots();
+}
+
+class FavoriteService {
+  getFav() {
+    Firestore.instance
+        .collection('mobiles')
+        .getDocuments()
+        .then((querySnapshot) {
+      querySnapshot.documents.forEach((result) {
+        print(result.data['product_name']);
+        return Firestore.instance
+            .collection('mobiles')
+            .where('product_name', isEqualTo: result.data['product_name'])
+            .snapshots();
+      });
+    });
+  }
 }

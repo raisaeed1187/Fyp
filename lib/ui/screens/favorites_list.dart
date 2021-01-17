@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutterfirebase/ui/widgets/product_card.dart';
 import 'package:getflutter/components/search_bar/gf_search_bar.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class FavoriteList extends StatefulWidget {
@@ -181,7 +180,7 @@ class _FavoriteListState extends State<FavoriteList> {
         Container(
           height: MediaQuery.of(context).size.height,
           child: StreamBuilder(
-              stream: allFavoriteQuery,
+              stream: allFavoriteQuery(AppData.activeUserId),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -193,6 +192,7 @@ class _FavoriteListState extends State<FavoriteList> {
                   itemCount: mobiles.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) {
+                    print("fav length: ${mobiles.length}");
                     DocumentSnapshot doc = mobiles[index];
                     return StreamBuilder(
                         stream: Firestore.instance
@@ -205,8 +205,7 @@ class _FavoriteListState extends State<FavoriteList> {
                           if (!snap.hasData) {
                             return Text('no data');
                           }
-                          print(
-                              'mobile data: ${snap.data.documents[0]['product_name']}');
+
                           return ListView.builder(
                             itemCount: snap.data.documents.length,
                             scrollDirection: Axis.horizontal,
@@ -214,6 +213,7 @@ class _FavoriteListState extends State<FavoriteList> {
                             itemBuilder: (context, index) {
                               DocumentSnapshot mobile =
                                   snap.data.documents[index];
+                              print('mobile data: ${mobile['product_name']}');
                               return ProductCard(
                                 product: Product(
                                   company: mobile['brand'],
