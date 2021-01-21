@@ -10,6 +10,7 @@ import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/screens/checkout.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/screens/login.dart';
+import 'package:flutterfirebase/ui/screens/previous_compares.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
 import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
@@ -118,6 +119,32 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
             ),
           ),
           ListTile(
+            trailing: Container(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Color(0xFFFB7C7A),
+              ),
+              child: Text(
+                AppData.previousComparisonsList.length.toString() ?? "0",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            leading: Icon(Icons.compare_arrows, color: Colors.black54),
+            title: Text('Previous Comparison',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54)),
+            onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => PreviousCompres()));
+            },
+          ),
+          ListTile(
             leading: Icon(Feather.getIconData('search'), color: blackColor),
             title: Text('Search',
                 style: TextStyle(
@@ -152,47 +179,26 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               Nav.route(context, Checkout());
             },
           ),
-          ListTile(
-            trailing: Icon(
-              Icons.looks_two,
-              color: Color(0xFFFB7C7A),
-              size: 18,
-            ),
-            leading: Icon(Icons.compare_arrows, color: blackColor),
-            title: Text('Previous Comparison',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   PageTransition(
-              //     type: PageTransitionType.fade,
-              //     child: ShoppingCart(true),
-              //   ),
-              // );
-            },
-          ),
-          ListTile(
-            leading: Icon(Feather.getIconData('settings'), color: blackColor),
-            title: Text('Settings',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => UserSettings()));
-              // Navigator.push(
-              //   context,
-              //   PageTransition(
-              //     type: PageTransitionType.fade,
-              //     child: UserSettings(),
-              //   ),
-              // );
-            },
-          ),
+
+          // ListTile(
+          //   leading: Icon(Feather.getIconData('settings'), color: blackColor),
+          //   title: Text('Settings',
+          //       style: TextStyle(
+          //           fontSize: 16,
+          //           fontWeight: FontWeight.w600,
+          //           color: blackColor)),
+          //   onTap: () {
+          //     Navigator.of(context).push(
+          //         MaterialPageRoute(builder: (context) => UserSettings()));
+          //     // Navigator.push(
+          //     //   context,
+          //     //   PageTransition(
+          //     //     type: PageTransitionType.fade,
+          //     //     child: UserSettings(),
+          //     //   ),
+          //     // );
+          //   },
+          // ),
           ListTile(
             leading: Icon(Feather.getIconData('x-circle'), color: blackColor),
             title: Text('Logout',

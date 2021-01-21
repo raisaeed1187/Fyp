@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutterfirebase/modal/comparisonMobileModal.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
@@ -126,11 +128,69 @@ class _ComparisonState extends State<Comparison> {
     }
   }
 
+  void addInPreviousList() {
+    if (AppData.compareList.length == 2) {
+      String com_id = AppData.compareList[0].data['product_name'] +
+          "+" +
+          AppData.compareList[1].data['product_name'];
+      String mobile1 = AppData.compareList[0].data['product_name'];
+      String mobile2 = AppData.compareList[1].data['product_name'];
+      // ComparisonMobileModal(
+      //     id: com_id,
+      //     mobileName1: mobile1,
+      //     mobileName2: mobile2,
+      //     mobileName3: "",
+      //     mobileName4: "");
+      AppData.previousComparisonsList.add(ComparisonMobileModal(
+          id: com_id,
+          mobileName1: mobile1,
+          mobileName2: mobile2,
+          mobileName3: "",
+          mobileName4: ""));
+    } else if (AppData.compareList.length == 3) {
+      String com_id = AppData.compareList[0].data['product_name'] +
+          "+" +
+          AppData.compareList[1].data['product_name'] +
+          "+" +
+          AppData.compareList[2].data['product_name'];
+      String mobile1 = AppData.compareList[0].data['product_name'];
+      String mobile2 = AppData.compareList[1].data['product_name'];
+      String mobile3 = AppData.compareList[2].data['product_name'];
+
+      AppData.previousComparisonsList.add(ComparisonMobileModal(
+          id: com_id,
+          mobileName1: mobile1,
+          mobileName2: mobile2,
+          mobileName3: mobile3,
+          mobileName4: ""));
+    } else if (AppData.compareList.length == 4) {
+      String com_id = AppData.compareList[0].data['product_name'] +
+          "+" +
+          AppData.compareList[1].data['product_name'] +
+          "+" +
+          AppData.compareList[2].data['product_name'] +
+          "+" +
+          AppData.compareList[3].data['product_name'];
+      String mobile1 = AppData.compareList[0].data['product_name'];
+      String mobile2 = AppData.compareList[1].data['product_name'];
+      String mobile3 = AppData.compareList[2].data['product_name'];
+      String mobile4 = AppData.compareList[3].data['product_name'];
+
+      AppData.previousComparisonsList.add(ComparisonMobileModal(
+          id: com_id,
+          mobileName1: mobile1,
+          mobileName2: mobile2,
+          mobileName3: mobile3,
+          mobileName4: mobile4));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getScore();
     sortMobile();
+    addInPreviousList();
     // print("screen size: ${getScreenSize(0, 'display', 3)}");
     // AppData.compareList.clear();
     // print(this.compareList.length);
@@ -185,7 +245,8 @@ class _ComparisonState extends State<Comparison> {
                                     Align(
                                         alignment: Alignment.centerLeft,
                                         child: IconButton(
-                                          icon: Icon(Icons.arrow_back),
+                                          icon: Icon(Ionicons.getIconData(
+                                              "ios-arrow-back")),
                                           onPressed: () {
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
@@ -197,6 +258,7 @@ class _ComparisonState extends State<Comparison> {
                                                 .watch<ComparisonProvider>();
                                             comparisonProvider
                                                 .clearCompareList();
+                                            // Navigator.of(context).pop();
                                           },
                                         )),
                                     Expanded(

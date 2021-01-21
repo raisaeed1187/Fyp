@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutterfirebase/favorite/main.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
+import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
@@ -86,6 +88,19 @@ class _ProductDetailsState extends State<ProductDetails> {
     });
   }
 
+  bool checkCompare = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (AppData.compareListNames.contains(mobile.data['product_name'])) {
+      // print('this mobile in list');
+      setState(() {
+        checkCompare = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,31 +167,31 @@ class _ProductDetailsState extends State<ProductDetails> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        RaisedButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Price Alert',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          ),
-                          color: Color(0xFFFF6969),
-                        ),
-                        SizedBox(
-                          width: 50,
-                        ),
-                        RaisedButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Compare',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                            ),
-                          ),
-                          color: Colors.lightBlue,
-                        )
+                        // RaisedButton(
+                        //   onPressed: () {},
+                        //   child: Text(
+                        //     'Price Alert',
+                        //     style: TextStyle(
+                        //       color: Colors.white,
+                        //       fontSize: 15,
+                        //     ),
+                        //   ),
+                        //   color: Color(0xFFFF6969),
+                        // ),
+                        // SizedBox(
+                        //   width: 50,
+                        // ),
+                        // RaisedButton(
+                        //   onPressed: () {},
+                        //   child: Text(
+                        //     'Compare',
+                        //     style: TextStyle(
+                        //       color: Colors.white,
+                        //       fontSize: 15,
+                        //     ),
+                        //   ),
+                        //   color: Colors.lightBlue,
+                        // )
                       ],
                     ),
                   ),
@@ -225,18 +240,85 @@ class _ProductDetailsState extends State<ProductDetails> {
                           SizedBox(
                             width: 50,
                           ),
-                          RaisedButton(
-                            onPressed: () => {},
-                            child: Text(
-                              'Buy Now',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 15,
-                              ),
-                            ),
-                            color: Colors.pinkAccent,
-                            highlightColor: Colors.black,
-                          )
+                          checkCompare
+                              ? RaisedButton(
+                                  onPressed: () {},
+                                  disabledColor: Color(0xFFFF69),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.done,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        'Compare',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  color: Color(0xFFFF6969),
+                                )
+                              : RaisedButton(
+                                  onPressed: () {
+                                    if (AppData.compareList.length < 4) {
+                                      setState(() {
+                                        checkCompare = true;
+                                        AppData.compareList.add(mobile);
+                                      });
+                                      Provider.of<ComparisonProvider>(context,
+                                              listen: false)
+                                          .addItemInList(mobile);
+                                      AppData.compareListNames
+                                          .add(mobile.data['product_name']);
+                                    } else {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Row(
+                                                children: <Widget>[
+                                                  Expanded(
+                                                    child: Text(
+                                                      'you Compare more then 4 mobiles ',
+                                                      style: TextStyle(
+                                                          fontSize: 15),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              content: FlatButton(
+                                                onPressed: () {
+                                                  List<DocumentSnapshot> list =
+                                                      AppData.compareList;
+                                                  Navigator.pop(context);
+                                                  Navigator.of(context).push(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Comparison(
+                                                                compareList:
+                                                                    list,
+                                                              )));
+                                                },
+                                                child: Text('Compare Now'),
+                                                color: Colors.green,
+                                              ),
+                                            );
+                                          });
+                                    }
+                                  },
+                                  disabledColor: Color(0xFFFF69),
+                                  child: Text(
+                                    'Compare',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  color: Color(0xFFFF6969),
+                                ),
                         ],
                       ),
                     ),

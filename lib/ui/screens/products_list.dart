@@ -6,6 +6,8 @@ import 'package:flutter_icons/ionicons.dart';
 import 'package:flutter_icons/material_community_icons.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/widgets/filter.dart';
@@ -16,6 +18,7 @@ import 'package:flutterfirebase/ui/widgets/product_card.dart';
 import 'package:getflutter/components/search_bar/gf_search_bar.dart';
 // import 'package:page_transition/page_transition.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:provider/provider.dart';
 
 class ProductList extends StatefulWidget {
   List<DocumentSnapshot> mobilesList;
@@ -54,6 +57,7 @@ class _ProductListState extends State<ProductList> {
     'B',
     'C'
   ];
+  GlobalKey key = new GlobalKey();
 
   @override
   void initState() {
@@ -63,11 +67,16 @@ class _ProductListState extends State<ProductList> {
     // setState(() {
     //   AppData.filterMobiles = mobilesList;
     // });
+    // final comparisonProvider = context.watch<ComparisonProvider>();
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    final comparisonProvider = context.watch<ComparisonProvider>();
+    if (AppData.compareList.length == 0) {
+      comparisonProvider.clearCompareList();
+    }
     Future.delayed(Duration(seconds: 5))
         .then((value) => AppData.filterMobiles.clear());
     print("length in product page: ${mobilesList.length}");
@@ -75,7 +84,7 @@ class _ProductListState extends State<ProductList> {
     final double itemHeight = (size.height - kToolbarHeight - 24) / 3;
     final double itemWidth = size.width / 2;
     return Scaffold(
-      key: _scaffoldKey,
+      // key: _scaffoldKey,
       appBar: AppBar(
         title: Padding(
           padding: EdgeInsets.only(top: 20, bottom: 5),
@@ -140,6 +149,73 @@ class _ProductListState extends State<ProductList> {
               .push(MaterialPageRoute(builder: (context) => Home())),
         ),
         actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              if (AppData.compareList.length >= 2) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => Comparison(
+                          compareList: AppData.compareList,
+                        )));
+              } else {
+                // infoToast("Select minimam two mobiles");
+                showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                'Select minimam two mobiles',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(''),
+                      );
+                    });
+              }
+            },
+            child: Container(
+              width: 35,
+              margin: EdgeInsets.only(top: 15),
+              child: Stack(
+                // overflow: Overflow.visible,
+                children: <Widget>[
+                  Icon(
+                    Icons.compare_arrows,
+                    color: Colors.black,
+                    key: key,
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        // Icon(
+                        //   Icons.favorite,
+                        //   color: Colors.red,
+                        //   size: 20,
+                        // ),
+                        Container(
+                          width: 15,
+                          height: 15,
+                          decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        Text(comparisonProvider.compareList.length.toString(),
+                            style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+          Text(''),
           // Padding(
           //   padding: const EdgeInsets.only(right: 24.0),
           //   child: SizedBox(
@@ -152,13 +228,13 @@ class _ProductListState extends State<ProductList> {
           //       ),
           //       color: Colors.black,
           //       onPressed: () {
-          //         Navigator.push(
-          //           context,
-          //           PageTransition(
-          //             type: PageTransitionType.fade,
-          //             child: ProductList(),
-          //           ),
-          //         );
+          //         // Navigator.push(
+          //         //   context,
+          //         //   PageTransition(
+          //         //     type: PageTransitionType.fade,
+          //         //     child: ProductList(),
+          //         //   ),
+          //         // );
           //       },
           //     ),
           //   ),

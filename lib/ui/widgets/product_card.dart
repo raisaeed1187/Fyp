@@ -7,6 +7,7 @@ import 'package:flutterfirebase/favorite/main.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
@@ -120,56 +121,22 @@ class _ProductCardState extends State<ProductCard> {
                                   )
                                 : InkWell(
                                     onTap: () {
-                                      setState(() {
-                                        checkCompare = true;
-                                      });
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            if (AppData.compareList.length <
-                                                4) {
-                                              AppData.compareList
-                                                  .add(widget.product.mobile);
-                                              AppData.compareListNames
-                                                  .add(widget.product.name);
-                                              return AlertDialog(
-                                                title: Row(
-                                                  children: <Widget>[
-                                                    Text(
-                                                      'Mobiles in Compare list ',
-                                                      style: TextStyle(
-                                                          fontSize: 15),
-                                                    ),
-                                                    Text(
-                                                        AppData
-                                                            .compareList.length
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                            fontSize: 15)),
-                                                  ],
-                                                ),
-                                                content: FlatButton(
-                                                  onPressed: () {
-                                                    List<DocumentSnapshot>
-                                                        list =
-                                                        AppData.compareList;
-                                                    Navigator.pop(context);
-
-                                                    Navigator.of(context).push(
-                                                        MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    Comparison(
-                                                                      compareList:
-                                                                          list,
-                                                                    )));
-                                                    // AppData.compareList.clear();
-                                                  },
-                                                  child: Text('Compare Now'),
-                                                  color: Colors.green,
-                                                ),
-                                              );
-                                            } else {
+                                      if (AppData.compareList.length < 4) {
+                                        setState(() {
+                                          checkCompare = true;
+                                          AppData.compareList
+                                              .add(widget.product.mobile);
+                                        });
+                                        Provider.of<ComparisonProvider>(context,
+                                                listen: false)
+                                            .addItemInList(
+                                                widget.product.mobile);
+                                        AppData.compareListNames
+                                            .add(widget.product.name);
+                                      } else {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
                                               return AlertDialog(
                                                 title: Row(
                                                   children: <Widget>[
@@ -201,8 +168,8 @@ class _ProductCardState extends State<ProductCard> {
                                                   color: Colors.green,
                                                 ),
                                               );
-                                            }
-                                          });
+                                            });
+                                      }
                                     },
                                     child: Container(
                                       height: 25,

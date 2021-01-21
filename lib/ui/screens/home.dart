@@ -78,11 +78,12 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     // final userData = Provider.of<UserData>(context);
     // print(userData);
-    print('provider list: ${ComparisonProvider().compareList.length}');
+    print('previous list: ${AppData.previousComparisonsList.length}');
     if (AppData.compareList.length == 0) {
       final comparisonProvider = context.watch<ComparisonProvider>();
       comparisonProvider.clearCompareList();
     }
+
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
       child: DefaultTabController(
@@ -829,11 +830,6 @@ class _AllFavoriteComparesWidgetState extends State<AllFavoriteComparesWidget> {
         ),
         child: TotalFavoriteComparesWidget(),
       ),
-      // Icon(
-      //   Ionicons.getIconData('ios-radio-button-on'),
-      //   color: Color(0xFFFB7C7A),
-      //   size: 18,
-      // ),
       leading: Icon(Icons.favorite_border, color: Colors.black54),
       title: Text('Favorite Compares',
           style: TextStyle(

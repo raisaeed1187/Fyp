@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfirebase/modal/category.dart';
+import 'package:flutterfirebase/modal/comparisonMobileModal.dart';
 import 'package:flutterfirebase/modal/product.dart';
 
 class AppData {
@@ -7,6 +8,7 @@ class AppData {
   static List<DocumentSnapshot> mobilesList = [];
   static List<DocumentSnapshot> filterMobiles = [];
   static List<DocumentSnapshot> favoriteMobiles = [];
+  static List<ComparisonMobileModal> previousComparisonsList = [];
   static List<String> compareListNames = [];
   static String activeUserId = "";
   static String activeUserName = "";
