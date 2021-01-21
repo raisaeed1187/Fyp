@@ -214,7 +214,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                 ),
                               ),
                               Text(
-                                mobile['price'],
+                                mobile['price'].toString(),
                                 style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 25,
@@ -305,7 +305,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                                 ),
                                               ),
                                               Text(
-                                                "Rs ${mobile['price']}",
+                                                "Rs ${mobile['price'].toString()}",
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight: FontWeight.bold,
@@ -395,7 +395,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     ),
                                   ),
                                   Text(
-                                    "Rs ${mobile['price']}",
+                                    "Rs ${mobile['price'].toString()}",
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -1907,7 +1907,7 @@ Column buildTrending() {
                           icon: mobile['product_image'],
                           rating: 4.5,
                           remainingQuantity: 5,
-                          price: 'Rs ${mobile['price']}',
+                          price: 'Rs ${mobile['price'].toString()}',
                           mobile: mobile),
                       gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
                     );

@@ -46,12 +46,19 @@ class _ProductCardState extends State<ProductCard> {
     return favorite;
   }
 
+  bool checkCompare = false;
   bool favorite = false;
   bool deleteFavorite = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    if (AppData.compareListNames.contains(widget.product.name)) {
+      print('this mobile in list');
+      setState(() {
+        checkCompare = true;
+      });
+    }
   }
 
   @override
@@ -79,69 +86,150 @@ class _ProductCardState extends State<ProductCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             _productDetails(),
-                            InkWell(
-                              onTap: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      AppData.compareList
-                                          .add(widget.product.mobile);
-                                      return AlertDialog(
-                                        title: Row(
-                                          children: <Widget>[
-                                            Text(
-                                              'Mobiles in Compare list ',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            Text(
-                                                AppData.compareList.length
-                                                    .toString(),
-                                                style: TextStyle(fontSize: 15)),
-                                          ],
+                            checkCompare
+                                ? Container(
+                                    height: 25,
+                                    width: 80,
+                                    margin: EdgeInsets.only(top: 5),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFFF6969),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    padding: EdgeInsets.only(
+                                        top: 4, bottom: 4, left: 5),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.done,
+                                          color: Colors.white,
+                                          size: 18,
                                         ),
-                                        content: FlatButton(
-                                          onPressed: () {
-                                            List<DocumentSnapshot> list =
-                                                AppData.compareList;
+                                        Text(
+                                          'Compare',
+                                          // key: key,
+                                          style: TextStyle(
+                                            fontFamily: 'NeusaNextPro',
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        checkCompare = true;
+                                      });
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            if (AppData.compareList.length <
+                                                4) {
+                                              AppData.compareList
+                                                  .add(widget.product.mobile);
+                                              AppData.compareListNames
+                                                  .add(widget.product.name);
+                                              return AlertDialog(
+                                                title: Row(
+                                                  children: <Widget>[
+                                                    Text(
+                                                      'Mobiles in Compare list ',
+                                                      style: TextStyle(
+                                                          fontSize: 15),
+                                                    ),
+                                                    Text(
+                                                        AppData
+                                                            .compareList.length
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            fontSize: 15)),
+                                                  ],
+                                                ),
+                                                content: FlatButton(
+                                                  onPressed: () {
+                                                    List<DocumentSnapshot>
+                                                        list =
+                                                        AppData.compareList;
+                                                    Navigator.pop(context);
 
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Comparison(
-                                                          compareList: list,
-                                                        )));
-                                            // AppData.compareList.clear();
-                                          },
-                                          child: Text('Compare Now'),
-                                          color: Colors.green,
-                                        ),
-                                      );
-                                    });
-                              },
-                              child: Container(
-                                height: 25,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFFF6969),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                padding:
-                                    EdgeInsets.only(top: 4, bottom: 4, left: 5),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(
-                                      'Compare',
-                                      style: TextStyle(
-                                        fontFamily: 'NeusaNextPro',
-                                        color: Colors.white,
-                                        fontSize: 12,
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    Comparison(
+                                                                      compareList:
+                                                                          list,
+                                                                    )));
+                                                    // AppData.compareList.clear();
+                                                  },
+                                                  child: Text('Compare Now'),
+                                                  color: Colors.green,
+                                                ),
+                                              );
+                                            } else {
+                                              return AlertDialog(
+                                                title: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Text(
+                                                        'you Compare more then 4 mobiles ',
+                                                        style: TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                content: FlatButton(
+                                                  onPressed: () {
+                                                    List<DocumentSnapshot>
+                                                        list =
+                                                        AppData.compareList;
+                                                    Navigator.pop(context);
+                                                    Navigator.of(context).push(
+                                                        MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    Comparison(
+                                                                      compareList:
+                                                                          list,
+                                                                    )));
+                                                  },
+                                                  child: Text('Compare Now'),
+                                                  color: Colors.green,
+                                                ),
+                                              );
+                                            }
+                                          });
+                                    },
+                                    child: Container(
+                                      height: 25,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFFFF6969),
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                      ),
+                                      padding: EdgeInsets.only(
+                                          top: 4, bottom: 4, left: 5),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            'Compare',
+                                            style: TextStyle(
+                                              fontFamily: 'NeusaNextPro',
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                                  ),
                           ],
                         ),
                         Container(
@@ -172,8 +260,8 @@ class _ProductCardState extends State<ProductCard> {
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => ProductPage(
-              product: widget.product,
+            builder: (context) => ProductDetails(
+              mobile: widget.product.mobile,
             ),
           ),
         );

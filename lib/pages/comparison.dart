@@ -2,9 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
+import 'package:flutterfirebase/ui/screens/home.dart';
+import 'package:flutterfirebase/ui/widgets/favorite_compare_widget.dart';
 import 'package:flutterfirebase/widgets/FullComparisonWidget.dart';
 import 'package:flutterfirebase/widgets/OverviewWidget.dart';
 import 'package:flutterfirebase/widgets/compareAdvantages.dart';
+import 'package:provider/provider.dart';
 
 class Comparison extends StatefulWidget {
   List<DocumentSnapshot> compareList;
@@ -29,6 +34,15 @@ class _ComparisonState extends State<Comparison> {
         .allMatches(compareList[index][feature].toString())
         .map((e) => e.group(0))
         .join(' ')
+        .toString()
+        .substring(0, endPoint));
+  }
+
+  double getScreenSize(int index, String feature, int endPoint) {
+    return double.parse(RegExp(r'(\d+)')
+        .allMatches(compareList[index][feature].toString())
+        .map((e) => e.group(0))
+        .join('.')
         .toString()
         .substring(0, endPoint));
   }
@@ -117,9 +131,28 @@ class _ComparisonState extends State<Comparison> {
     super.initState();
     getScore();
     sortMobile();
+    // print("screen size: ${getScreenSize(0, 'display', 3)}");
     // AppData.compareList.clear();
-    print(this.compareList.length);
+    // print(this.compareList.length);
+    Comparator<DocumentSnapshot> mobileNameSort =
+        (a, b) => a.data['product_name'].compareTo(b.data['product_name']);
+    compareList.sort(mobileNameSort);
+    // compareList.sort((a, b) => a.length.compareTo(b.length));
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    AppData.compareList.clear();
+    AppData.compareListNames.clear();
+    ComparisonProvider().compareList.clear();
+    Provider.of<ComparisonProvider>(context, listen: false).clearCompareList();
+  }
+
+  // Future<bool> _onPressed() {
+  //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -149,16 +182,38 @@ class _ComparisonState extends State<Comparison> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
+                                    Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: IconButton(
+                                          icon: Icon(Icons.arrow_back),
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Home()));
+                                            AppData.compareList.clear();
+                                            AppData.compareListNames.clear();
+                                            final comparisonProvider = context
+                                                .watch<ComparisonProvider>();
+                                            comparisonProvider
+                                                .clearCompareList();
+                                          },
+                                        )),
                                     Expanded(
                                       child: Row(
                                         children: List.generate(
                                             compareList.length, (index) {
-                                          return Text(
-                                            compareList[index]['product_name'],
-                                            style: TextStyle(
-                                              fontSize: 18,
+                                          return Container(
+                                            child: Expanded(
+                                              child: Text(
+                                                compareList[index]
+                                                    ['product_name'],
+                                                style: TextStyle(
+                                                  fontSize: 18,
 //                        fontWeight: FontWeight.bold,
-                                              fontFamily: 'NeusaNextPro',
+                                                  fontFamily: 'NeusaNextPro',
+                                                ),
+                                              ),
                                             ),
                                           );
                                         }),
@@ -167,12 +222,16 @@ class _ComparisonState extends State<Comparison> {
                                     ),
                                     Align(
                                       alignment: Alignment.centerRight,
-                                      child: IconButton(
-                                        icon: Icon(Icons.favorite_border,
-                                            color: Color(0xFFFF6969), size: 30),
-                                        onPressed: () {
-                                          AppData.compareList.clear();
-                                        },
+                                      child: Container(
+                                        width: 30,
+                                        height: 20,
+                                        child:
+                                            StreamProvider<QuerySnapshot>.value(
+                                          value: favoriteCompare,
+                                          child: FavoriteCompareWidget(
+                                            compareList: compareList,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -193,7 +252,7 @@ class _ComparisonState extends State<Comparison> {
                                 return CompareMobile(
                                   image: compareList[index]['product_image'],
                                   name: compareList[index]['product_name'],
-                                  price: compareList[index]['price'],
+                                  price: compareList[index]['price'].toString(),
                                 );
                               }),
                             ),

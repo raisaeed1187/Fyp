@@ -11,8 +11,11 @@ class Filtre extends StatefulWidget {
 
 class _FiltreState extends State<Filtre> {
   double _lowerValue = 6000;
-  double _upperValue = 50000;
+  double _upperValue = 500000;
   List<String> brands = [];
+  List<String> rams = [];
+  List<int> batteries = [];
+
   void _priceFilter(int lower, int upper) {
     setState(() {
       AppData.filterMobiles = AppData.filterMobiles
@@ -23,33 +26,80 @@ class _FiltreState extends State<Filtre> {
     });
   }
 
-  List<String> allBrands = [];
-  getAllbrands() async {
-    QuerySnapshot results =
-        await Firestore.instance.collection('mobiles').getDocuments();
-    results.documents.forEach((element) {
-      allBrands.add(element.data['brand']);
+  void brandFilter(String brand) {
+    setState(() {
+      AppData.filterMobiles.addAll(AppData.mobilesList
+              .where((mobile) => (mobile['brand']) == brand)
+              ?.toList() ??
+          []);
     });
   }
 
+  List<String> allBrands = [
+    'Apple',
+    'Samsung',
+    'Oppo',
+    'RealMe',
+    'Nokia',
+    'Tecno',
+    'Vivo',
+    'Infinix',
+    'Itel',
+  ];
+  int minPrice = 10000;
+  int maxPrice = 100000;
+  List<int> allBattries = [2500, 3000, 3500, 4000, 4500, 5000];
+  List<String> allrams = ['2 GB', '3 GB', '4 GB', '5 GB', '6 GB'];
+  List<bool> ramList = [false, false, false, false, false];
   applyFilters() async {
     AppData.filterMobiles.clear();
     print(allBrands.length);
-    final QuerySnapshot result = await Firestore.instance
-        .collection('mobiles')
-        // .where('brand', isEqualTo: 'Xiaomi')
-        .where('brand', whereIn: brands)
-        // .where('price', isGreaterThanOrEqualTo: _lowerValue.toString())
-        .where('price', isLessThanOrEqualTo: _upperValue)
-        .getDocuments();
-    print(result.documents.length);
-    AppData.filterMobiles = result.documents;
+    // if (rams.length == batteries.length) {
+    for (var i = 0; i < rams.length; i++) {
+      final QuerySnapshot result = await Firestore.instance
+          .collection('mobiles')
+          // .where('battery_size',
+          //     isGreaterThanOrEqualTo:
+          //         batteries.isEmpty ? null : batteries[0] - 500)
+          .where('battery_size',
+              isEqualTo: batteries.isEmpty ? null : batteries[0])
+          .where('brand', whereIn: brands.isEmpty ? null : brands)
+          // .where('ram', isEqualTo: '2 GB')
+          .where('ram', isEqualTo: rams.isEmpty ? null : rams[i])
+          // .where('ram', whereIn: rams.isEmpty ? allrams : rams)
+          .where('price', isGreaterThanOrEqualTo: minPrice)
+          .where('price', isLessThanOrEqualTo: maxPrice)
+          .getDocuments();
+      print(result.documents.length);
+      AppData.filterMobiles.addAll(result.documents);
+    }
+    // }
   }
 
+//---------battery checkbox----------
   bool _checkbox = false;
+  bool _checkbox25 = false;
+  bool _checkbox30 = false;
+  bool _checkbox35 = false;
+  bool _checkbox40 = false;
+  bool _checkbox45 = false;
+  bool _checkbox50 = false;
+//------------ram checkbox--------
+  bool _checkbox2 = false;
+  bool _checkbox3 = false;
+  bool _checkbox4 = false;
+  bool _checkbox5 = false;
+  bool _checkbox6 = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    getAllbrands();
+    print("In filterchip ${AppData.filterMobiles.length}");
     return SafeArea(
       child: Container(
         padding: EdgeInsets.all(12.0),
@@ -153,11 +203,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox25,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox25 = !_checkbox25;
+                                  if (_checkbox25 == true) {
+                                    batteries.add(2500);
+                                  } else {
+                                    batteries.remove(2500);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -172,11 +227,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox30,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox30 = !_checkbox30;
+                                  if (_checkbox30 == true) {
+                                    batteries.add(3000);
+                                  } else {
+                                    batteries.remove(3000);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -191,11 +251,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox35,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox35 = !_checkbox35;
+                                  if (_checkbox35 == true) {
+                                    batteries.add(3500);
+                                  } else {
+                                    batteries.remove(3500);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -210,11 +275,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox40,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox40 = !_checkbox40;
+                                  if (_checkbox40 == true) {
+                                    batteries.add(4000);
+                                  } else {
+                                    batteries.remove(4000);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -230,11 +300,16 @@ class _FiltreState extends State<Filtre> {
                             // width: 10,
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox45,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox45 = !_checkbox45;
+                                  if (_checkbox45 == true) {
+                                    batteries.add(4500);
+                                  } else {
+                                    batteries.remove(4500);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -249,11 +324,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: _checkbox50,
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  _checkbox50 = !_checkbox50;
+                                  if (_checkbox50 == true) {
+                                    batteries.add(5000);
+                                  } else {
+                                    batteries.remove(5000);
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -283,11 +363,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: ramList[0],
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  ramList[0] = value;
+                                  if (ramList[0] == true) {
+                                    rams.add('2 GB');
+                                  } else {
+                                    rams.remove('2 GB');
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -302,11 +387,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: ramList[1],
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  ramList[1] = value;
+                                  if (ramList[1] == true) {
+                                    rams.add('3 GB');
+                                  } else {
+                                    rams.remove('3 GB');
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -321,11 +411,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: ramList[2],
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  ramList[2] = value;
+                                  if (ramList[2] == true) {
+                                    rams.add('4 GB');
+                                  } else {
+                                    rams.remove('4 GB');
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -340,11 +435,16 @@ class _FiltreState extends State<Filtre> {
                           SizedBox(
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: ramList[3],
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  ramList[3] = !ramList[3];
+                                  if (_checkbox5 == true) {
+                                    rams.add('5 GB');
+                                  } else {
+                                    rams.remove('5 GB');
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -360,11 +460,16 @@ class _FiltreState extends State<Filtre> {
                             // width: 10,
                             height: 30,
                             child: Checkbox(
-                              value: _checkbox,
+                              value: ramList[4],
                               activeColor: Theme.of(context).primaryColor,
                               onChanged: (value) {
                                 setState(() {
-                                  _checkbox = !_checkbox;
+                                  ramList[4] = !ramList[4];
+                                  if (ramList[4] == true) {
+                                    rams.add('6 GB');
+                                  } else {
+                                    rams.remove('6 GB');
+                                  }
                                 });
                               },
                               materialTapTargetSize:
@@ -421,9 +526,9 @@ class _FiltreState extends State<Filtre> {
                       borderRadius: BorderRadius.circular(4),
                       color: Colors.red.withOpacity(0.5)),
                 ),
-                values: [3000, 42000],
+                values: [3000, 420000],
                 rangeSlider: true,
-                max: 50000,
+                max: 500000,
                 min: 0,
                 onDragging: (handlerIndex, lowerValue, upperValue) {
                   _lowerValue = lowerValue;
@@ -431,11 +536,15 @@ class _FiltreState extends State<Filtre> {
                   // int lower = _lowerValue;
                   int lower = _lowerValue.round();
                   int upper = _upperValue.round();
+                  setState(() {
+                    minPrice = lowerValue.round();
+                    maxPrice = upperValue.round();
+                  });
                   print("lower :${lower.toString()}");
                   print("upper :${upper.toString()}");
-                  print(AppData.filterMobiles.length);
-                  _priceFilter(lower, upper);
-                  print(AppData.filterMobiles.length);
+                  // print(AppData.filterMobiles.length);
+                  // _priceFilter(lower, upper);
+                  // print(AppData.filterMobiles.length);
                 },
               ),
               Center(
@@ -444,20 +553,20 @@ class _FiltreState extends State<Filtre> {
                     print('apply filter click');
                     print("total filter: ${AppData.mobilesList.length}");
 
-                    if (brands.isNotEmpty) {
-                      await applyFilters();
-                      print("total filter: ${AppData.filterMobiles.length}");
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              ProductList(mobilesList: AppData.filterMobiles)));
-                    } else {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ProductList(mobilesList: AppData.mobilesList),
-                        ),
-                      );
-                    }
+                    // if (brands.isNotEmpty) {
+                    await applyFilters();
+                    print("total filter: ${AppData.filterMobiles.length}");
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ProductList(mobilesList: AppData.filterMobiles)));
+                    // } else {
+                    //   Navigator.of(context).push(
+                    //     MaterialPageRoute(
+                    //       builder: (context) =>
+                    //           ProductList(mobilesList: AppData.mobilesList),
+                    //     ),
+                    //   );
+                    // }
                   },
                   color: Theme.of(context).primaryColor,
                   child: Text(
@@ -522,6 +631,8 @@ class _filterChipWidgetState extends State<filterChipWidget> {
       ),
       backgroundColor: Colors.grey.shade400,
       onSelected: (isSelected) {
+        // widget.filterBrands(widget.chipName);
+        print(AppData.filterMobiles.length);
         setState(() {
           _isSelected = isSelected;
           if (_isSelected == true) {

@@ -30,40 +30,7 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
     });
   }
 
-  bool design = false;
-  void designWidget() {
-    setState(() {
-      design = !design;
-    });
-  }
-
-  bool memory = false;
-  void memoryWidget() {
-    setState(() {
-      memory = !memory;
-    });
-  }
-
-  bool camera = false;
-  void cameraWidget() {
-    setState(() {
-      camera = !camera;
-    });
-  }
-
-  bool battery = false;
-  void batteryWidget() {
-    setState(() {
-      battery = !battery;
-    });
-  }
-
-  bool extra = false;
-  void extraWidget() {
-    setState(() {
-      extra = !extra;
-    });
-  }
+  List<bool> toggle = [true, true, true];
 
   // static Mobile mobile4;
   // List<void> toggleFunctions=[
@@ -93,7 +60,7 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
                   child: Text(
                     'ADVANTAGES (FACTORS TO DECIDE WHICH MOBILE YOU SHOULD BUY)',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -105,7 +72,7 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
                   color: Colors.grey[200],
                 ),
               ),
-              // Container(
+              //  // Container(
               //   child: Column(
               //     crossAxisAlignment: CrossAxisAlignment.start,
               //     children: [
@@ -256,7 +223,7 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
               //       ),
               //     ],
               //   ),
-              // ),
+              //  // ),
               Column(
                   children: List.generate(compareList.length, (index) {
                 // if (index != compareList.length - 1) {
@@ -359,7 +326,7 @@ class comparisonWidget extends StatelessWidget {
   }
 }
 
-class ReasonWidget extends StatelessWidget {
+class ReasonWidget extends StatefulWidget {
   Function getFunction;
   List<DocumentSnapshot> compareList;
   List<int> mobilesScore;
@@ -374,9 +341,14 @@ class ReasonWidget extends StatelessWidget {
       this.index,
       this.secondIndex});
 
+  @override
+  _ReasonWidgetState createState() => _ReasonWidgetState();
+}
+
+class _ReasonWidgetState extends State<ReasonWidget> {
   int getNumber(int index, String feature, int endPoint) {
     return int.parse(RegExp(r'(\d+)')
-        .allMatches(compareList[index][feature].toString())
+        .allMatches(widget.compareList[index][feature].toString())
         .map((e) => e.group(0))
         .join(' ')
         .toString()
@@ -400,19 +372,22 @@ class ReasonWidget extends StatelessWidget {
   }
 
   List<int> mobsRam = [];
+
   List<int> mobsCamera = [];
+
   List<int> mobsStorage = [];
+
   List<int> mobsBattery = [];
 
   void getMobInfo() {
-    for (int i = 0; i < compareList.length; i++) {
+    for (int i = 0; i < widget.compareList.length; i++) {
       mobsRam.add(getRam(i));
       mobsCamera.add(getCamera(i));
       mobsStorage.add(getStorage(i));
       mobsBattery.add(getBattery(i));
     }
-    for (int i = 0; i < compareList.length; i++) {
-      for (int j = i + 1; j < compareList.length; j++) {
+    for (int i = 0; i < widget.compareList.length; i++) {
+      for (int j = i + 1; j < widget.compareList.length; j++) {
         if (mobsRam[i] < mobsRam[j]) {
           int temp = mobsRam[i];
           mobsRam[i] = mobsRam[j];
@@ -436,7 +411,7 @@ class ReasonWidget extends StatelessWidget {
       }
     }
     // print(mobsRam[0]);
-    for (int i = 0; i < compareList.length; i++) {
+    for (int i = 0; i < widget.compareList.length; i++) {
       if (getRam(i) == mobsRam[0]) {
         print('more ram ${getRam(i)}');
       }
@@ -451,7 +426,7 @@ class ReasonWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
-            onTap: getFunction,
+            onTap: widget.getFunction,
             child: Expanded(
               child: Container(
                 width: double.infinity,
@@ -473,7 +448,7 @@ class ReasonWidget extends StatelessWidget {
                                   style: TextStyle(fontSize: 20),
                                 ),
                                 Text(
-                                  (index + 1).toString(),
+                                  (widget.index + 1).toString(),
                                   style: TextStyle(fontSize: 20),
                                 ),
                               ],
@@ -493,7 +468,8 @@ class ReasonWidget extends StatelessWidget {
                                     TextStyle(fontSize: 20, letterSpacing: 1),
                               ),
                               Text(
-                                compareList[index]['product_name'],
+                                widget.compareList[widget.index]
+                                    ['product_name'],
                                 style:
                                     TextStyle(fontSize: 20, letterSpacing: 1),
                               ),
@@ -503,7 +479,7 @@ class ReasonWidget extends StatelessWidget {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(15.0),
-                        child: Icon(toggleVariable
+                        child: Icon(widget.toggleVariable
                             ? Icons.keyboard_arrow_up
                             : Icons.keyboard_arrow_down),
                       ),
@@ -520,7 +496,7 @@ class ReasonWidget extends StatelessWidget {
             maintainSize: false,
             maintainAnimation: true,
             maintainState: true,
-            visible: toggleVariable,
+            visible: widget.toggleVariable,
             child: Column(
               children: [
                 // comparisonWidget('Supports NFC', 'No', 'Yes'),
@@ -535,10 +511,10 @@ class ReasonWidget extends StatelessWidget {
                 //         feature: 'ram',
                 //       )
                 //     : Text(''),
-                getRam(index) == mobsRam[0]
+                getRam(widget.index) == mobsRam[0]
                     ? comparisonWidget(
                         title: 'More RAM',
-                        compareList: compareList,
+                        compareList: widget.compareList,
                         feature: 'ram',
                       )
                     : Text(''),
@@ -552,24 +528,24 @@ class ReasonWidget extends StatelessWidget {
                 //   compareList: compareList,
                 //   feature: 'primary_camera',
                 // )
-                getCamera(index) == mobsCamera[0]
+                getCamera(widget.index) == mobsCamera[0]
                     ? comparisonWidget(
                         title: 'Better Camera',
-                        compareList: compareList,
+                        compareList: widget.compareList,
                         feature: 'primary_camera',
                       )
                     : Text(''),
-                getStorage(index) == mobsStorage[0]
+                getStorage(widget.index) == mobsStorage[0]
                     ? comparisonWidget(
                         title: 'Storage',
-                        compareList: compareList,
+                        compareList: widget.compareList,
                         feature: 'storage',
                       )
                     : Text(''),
-                getBattery(index) == mobsBattery[0]
+                getBattery(widget.index) == mobsBattery[0]
                     ? comparisonWidget(
                         title: 'Bigger Battery',
-                        compareList: compareList,
+                        compareList: widget.compareList,
                         feature: 'battery',
                       )
                     : Text(''),

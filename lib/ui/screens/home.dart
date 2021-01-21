@@ -1,5 +1,6 @@
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:commons/commons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,31 +10,36 @@ import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/user.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/services/auth.dart';
 import 'package:flutterfirebase/services/database.dart';
 import 'package:flutterfirebase/services/favorite_services.dart';
+// import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/services/search_service.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/painters/circlepainters.dart';
 import 'package:flutterfirebase/ui/screens/favorites_list.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
-import 'package:flutterfirebase/ui/screens/search.dart';
+// import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/shoppingcart.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
-import 'package:flutterfirebase/ui/screens/whell.dart';
-import 'package:flutterfirebase/ui/utils/constant.dart';
+// import 'package:flutterfirebase/ui/screens/whell.dart';
+// import 'package:flutterfirebase/ui/utils/constant.dart';
 import 'package:flutterfirebase/ui/widgets/bannerWidget.dart';
+// import 'package:flutterfirebase/ui/widgets/favorite_compare_widget.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
 import 'package:flutterfirebase/ui/widgets/leftDrawer.dart';
-import 'package:flutterfirebase/ui/widgets/occasions.dart';
+import 'package:flutterfirebase/ui/widgets/compareCard.dart';
 // import 'package:flutterfirebase/ui/utils/navigator.dart';
 // import 'package:page_transition/page_transition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterfirebase/widgets/compareAdvantages.dart';
 import 'package:provider/provider.dart';
 // import 'checkout.dart';
 import 'products_list.dart';
 import 'usersettings.dart';
 // import 'dart:async';
+import 'package:flutterfirebase/ui/screens/favorite_compares.dart';
 
 class Home extends StatefulWidget {
   final String uid;
@@ -44,7 +50,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int currentIndex = 0;
-
+  GlobalKey key = new GlobalKey();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   void fetchData() {
     Firestore.instance
@@ -72,6 +78,11 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     // final userData = Provider.of<UserData>(context);
     // print(userData);
+    print('provider list: ${ComparisonProvider().compareList.length}');
+    if (AppData.compareList.length == 0) {
+      final comparisonProvider = context.watch<ComparisonProvider>();
+      comparisonProvider.clearCompareList();
+    }
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
       child: DefaultTabController(
@@ -90,7 +101,13 @@ class _HomeState extends State<Home> {
                 icon: new Icon(Icons.search),
               ),
               Tab(
-                icon: new Icon(Icons.shopping_cart),
+                child: StreamProvider<QuerySnapshot>.value(
+                  value: allFavoriteCompareQuery(AppData.activeUserId),
+                  child: Container(
+                    child: ComparisonTab(),
+                  ),
+                ),
+                // icon: new Icon(Icons.compare_arrows),
               ),
               Tab(
                 icon: new Icon(Icons.account_circle),
@@ -212,14 +229,14 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       buildTrending(),
-                      Occasions(),
+                      // CompareMobile(),
                       // Occasions(),
                     ],
                   ),
                 ),
               ),
               PageSearch(),
-              ShoppingCart(false),
+              FavoriteComparesList(),
               UserSettings(),
             ],
           ),
@@ -308,6 +325,8 @@ class _HomeState extends State<Home> {
   }
 
   AppBar buildAppBar(BuildContext context) {
+    final comparisonProvider = context.watch<ComparisonProvider>();
+
     return AppBar(
       title: Text(
         "MobHub",
@@ -318,43 +337,87 @@ class _HomeState extends State<Home> {
               color: Colors.black),
           onPressed: () => _scaffoldKey.currentState.openDrawer()),
       actions: <Widget>[
-        // GestureDetector(
-        //   onTap: () {
-        //     Navigator.of(context)
-        //         .push(MaterialPageRoute(builder: (context) => Search()));
-        //     // Navigator.push(
-        //     //   context,
-        //     //   PageTransition(
-        //     //     type: PageTransitionType.fade,
-        //     //     child: Search(),
-        //     //   ),
-        //     // );
-        //   },
-        //   child: Icon(
-        //     MaterialCommunityIcons.getIconData("magnify"),
-        //     color: Colors.black,
-        //   ),
-        // ),
-        IconButton(
-          icon: Icon(
-            // MaterialCommunityIcons.getIconData("cart-outline"),
-            Icons.notifications,
-          ),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => ProductList(
-                      mobilesList: AppData.mobilesList,
-                    )));
-            // Navigator.push(
-            //   context,
-            //   PageTransition(
-            //     type: PageTransitionType.fade,
-            //     child: ShoppingCart(true),
-            //   ),
-            // );
+        GestureDetector(
+          onTap: () {
+            if (AppData.compareList.length >= 2) {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Comparison(
+                        compareList: AppData.compareList,
+                      )));
+            } else {
+              // infoToast("Select minimam two mobiles");
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                              'Select minimam two mobiles',
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Text(''),
+                    );
+                  });
+            }
           },
+          child: Container(
+            width: 35,
+            margin: EdgeInsets.only(top: 15),
+            child: Stack(
+              // overflow: Overflow.visible,
+              children: <Widget>[
+                Icon(
+                  Icons.compare_arrows,
+                  color: Colors.black,
+                  key: key,
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      // Icon(
+                      //   Icons.favorite,
+                      //   color: Colors.red,
+                      //   size: 20,
+                      // ),
+                      Container(
+                        width: 15,
+                        height: 15,
+                        decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      Text(comparisonProvider.compareList.length.toString(),
+                          style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
+        Text(' '),
+        // IconButton(
+        //   icon: Icon(
+        //     // MaterialCommunityIcons.getIconData("cart-outline"),
+        //     Icons.compare_arrows,
+        //   ),
+        //   color: Colors.black,
+        //   onPressed: () {
+        //     Navigator.of(context).push(MaterialPageRoute(
+        //         builder: (context) => Comparison(
+        //               compareList: AppData.compareList,
+        //             )));
+
+        //   },
+        // ),
       ],
       backgroundColor: Colors.white,
     );
@@ -633,6 +696,8 @@ class CategoriesListView extends StatelessWidget {
   }
 }
 
+//---------------favorite mobiles
+
 class AllFavoritesWidget extends StatefulWidget {
   @override
   _AllFavoritesWidgetState createState() => _AllFavoritesWidgetState();
@@ -643,17 +708,6 @@ class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
   Widget build(BuildContext context) {
     final queryFavorites = Provider.of<QuerySnapshot>(context);
 
-    // AppData.favoriteMobiles.clear();
-    // queryFavorites.documents.forEach((element) {
-    //   Firestore.instance
-    //       .collection('mobiles')
-    //       .document(element.data['product_id'])
-    //       .get()
-    //       .then((value) {
-    //     // print('favorite: $value');
-    //     AppData.favoriteMobiles.add(value);
-    //   });
-    // });
     print('total favorites: ${AppData.favoriteMobiles.length}');
     return ListTile(
       trailing: Container(
@@ -670,7 +724,7 @@ class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
       //   size: 18,
       // ),
       leading: Icon(Icons.favorite_border, color: Colors.black54),
-      title: Text('Favorites',
+      title: Text('Favorite Mobiles',
           style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -678,7 +732,7 @@ class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => FavoriteList(
-                  mobilesList: AppData.favoriteMobiles,
+                  mobilesList: queryFavorites.documents,
                 )));
         // Navigator.push(
         //   context,
@@ -699,7 +753,109 @@ class TotalFavoritesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final favorites = Provider.of<QuerySnapshot>(context);
     return Text(
-      favorites.documents.length.toString(),
+      favorites.documents.length.toString() ?? "0",
+      style: TextStyle(
+          color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+    );
+  }
+}
+
+// compare tab item
+class ComparisonTab extends StatefulWidget {
+  @override
+  _ComparisonTabState createState() => _ComparisonTabState();
+}
+
+class _ComparisonTabState extends State<ComparisonTab> {
+  @override
+  Widget build(BuildContext context) {
+    final queryFavorites = Provider.of<QuerySnapshot>(context);
+
+    return Container(
+      width: 40,
+      child: Stack(
+        overflow: Overflow.visible,
+        children: <Widget>[
+          Icon(Icons.compare_arrows),
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Stack(
+              alignment: Alignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                  size: 20,
+                ),
+                TotalFavoriteComparesWidget()
+              ],
+            ),
+            // child: Container(
+            //   padding: EdgeInsets.symmetric(horizontal: 5),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(5),
+            //     color: Color(0xFFFB7C7A),
+            //   ),
+            //   child: TotalFavoriteComparesWidget(),
+            // ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+//--------end compare tab item
+//---------------all favorite compares
+class AllFavoriteComparesWidget extends StatefulWidget {
+  @override
+  _AllFavoriteComparesWidgetState createState() =>
+      _AllFavoriteComparesWidgetState();
+}
+
+class _AllFavoriteComparesWidgetState extends State<AllFavoriteComparesWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final queryFavorites = Provider.of<QuerySnapshot>(context);
+
+    print('total favorites: ${AppData.favoriteMobiles.length}');
+    return ListTile(
+      trailing: Container(
+        padding: EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Color(0xFFFB7C7A),
+        ),
+        child: TotalFavoriteComparesWidget(),
+      ),
+      // Icon(
+      //   Ionicons.getIconData('ios-radio-button-on'),
+      //   color: Color(0xFFFB7C7A),
+      //   size: 18,
+      // ),
+      leading: Icon(Icons.favorite_border, color: Colors.black54),
+      title: Text('Favorite Compares',
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black54)),
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => FavoriteComparesList(
+                  compareList: queryFavorites.documents,
+                )));
+      },
+    );
+  }
+}
+
+class TotalFavoriteComparesWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final favorites = Provider.of<QuerySnapshot>(context);
+    return Text(
+      favorites.documents.length.toString() ?? "0",
       style: TextStyle(
           color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
     );

@@ -7,6 +7,7 @@ class AppData {
   static List<DocumentSnapshot> mobilesList = [];
   static List<DocumentSnapshot> filterMobiles = [];
   static List<DocumentSnapshot> favoriteMobiles = [];
+  static List<String> compareListNames = [];
   static String activeUserId = "";
   static String activeUserName = "";
   static List<Product> productList = [

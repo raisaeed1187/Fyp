@@ -111,6 +111,12 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               child: AllFavoritesWidget(),
             ),
           ),
+          StreamProvider<QuerySnapshot>.value(
+            value: allFavoriteCompareQuery(AppData.activeUserId),
+            child: Container(
+              child: AllFavoriteComparesWidget(),
+            ),
+          ),
           ListTile(
             leading: Icon(Feather.getIconData('search'), color: blackColor),
             title: Text('Search',
@@ -166,30 +172,6 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               //     child: ShoppingCart(true),
               //   ),
               // );
-            },
-          ),
-          ListTile(
-            leading:
-                Icon(Feather.getIconData('message-circle'), color: blackColor),
-            title: Text('Support',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, ProductList());
-            },
-          ),
-          ListTile(
-            leading:
-                Icon(Feather.getIconData('help-circle'), color: blackColor),
-            title: Text('Help',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              Nav.route(context, UserSettings());
             },
           ),
           ListTile(

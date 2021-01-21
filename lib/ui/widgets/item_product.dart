@@ -7,6 +7,7 @@ import 'package:flutterfirebase/favorite/main.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
@@ -52,10 +53,18 @@ class _TrendingItemState extends State<TrendingItem> {
 
   bool favorite = false;
   bool deleteFavorite = false;
+  bool checkCompare = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    if (AppData.compareListNames.contains(widget.product.name)) {
+      print('this mobile in list');
+      setState(() {
+        checkCompare = true;
+      });
+    }
     // print("check id: ${checkFavoriteMethod('1Yq5PFWie8CmqyyYnDTT')}");
   }
 
@@ -84,137 +93,155 @@ class _TrendingItemState extends State<TrendingItem> {
                           child: StreamProvider<List<FavoriteModal>>.value(
                             value: allFavorite,
                             child: FavoriteWidget(
-                              mobile: widget.product.mobile,
-                            ),
+                                  mobile: widget.product.mobile,
+                                ) ??
+                                Text(''),
                           ),
                         ),
                       ],
                     ),
                     _productImage(),
                     _productDetails(),
-                    InkWell(
-                      onTap: () {
-                        // if (AppData.compareList.length < 4) {
-                        //   AppData.compareList.add(widget.product.mobile);
-                        //   ShowMoreTextPopup popup = ShowMoreTextPopup(
-                        //     context,
-                        //     text:
-                        //         'Mobiles in Compare list ${AppData.compareList.length.toString()} ',
-                        //     textStyle: TextStyle(color: Colors.white),
-                        //     height: 30,
-                        //     width: 200,
-                        //     backgroundColor: Colors.amber,
-                        //     padding: EdgeInsets.all(4.0),
-                        //     borderRadius: BorderRadius.circular(10.0),
-                        //   );
-                        //   popup.show(
-                        //     widgetKey: key,
-                        //   );
-                        // } else {
-                        //   ShowMoreTextPopup popup = ShowMoreTextPopup(
-                        //     context,
-                        //     text: 'You can compare only 4 mobiles',
-                        //     textStyle: TextStyle(color: Colors.white),
-                        //     height: 30,
-                        //     width: 200,
-                        //     backgroundColor: Colors.amber,
-                        //     padding: EdgeInsets.all(4.0),
-                        //     borderRadius: BorderRadius.circular(10.0),
-                        //   );
-                        //   popup.show(
-                        //     widgetKey: key,
-                        //   );
-                        // }
+                    checkCompare
+                        ? Container(
+                            height: 25,
+                            width: 80,
+                            margin: EdgeInsets.only(top: 5),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFF6969),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            padding:
+                                EdgeInsets.only(top: 4, bottom: 4, left: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.done,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                                Text(
+                                  'Compare',
+                                  key: key,
+                                  style: TextStyle(
+                                    fontFamily: 'NeusaNextPro',
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : InkWell(
+                            onTap: () {
+                              // if (AppData.compareList.length < 4) {
+                              //   AppData.compareList.add(widget.product.mobile);
+                              //   ShowMoreTextPopup popup = ShowMoreTextPopup(
+                              //     context,
+                              //     text:
+                              //         'Mobiles in Compare list ${AppData.compareList.length.toString()} ',
+                              //     textStyle: TextStyle(color: Colors.white),
+                              //     height: 30,
+                              //     width: 200,
+                              //     backgroundColor: Colors.amber,
+                              //     padding: EdgeInsets.all(4.0),
+                              //     borderRadius: BorderRadius.circular(10.0),
+                              //   );
+                              //   popup.show(
+                              //     widgetKey: key,
+                              //   );
+                              // } else {
+                              //   ShowMoreTextPopup popup = ShowMoreTextPopup(
+                              //     context,
+                              //     text: 'You can compare only 4 mobiles',
+                              //     textStyle: TextStyle(color: Colors.white),
+                              //     height: 30,
+                              //     width: 200,
+                              //     backgroundColor: Colors.amber,
+                              //     padding: EdgeInsets.all(4.0),
+                              //     borderRadius: BorderRadius.circular(10.0),
+                              //   );
+                              //   popup.show(
+                              //     widgetKey: key,
+                              //   );
+                              // }
 
-                        /// show the popup for specific widget
+                              /// show the popup for specific widget
 
-                        print(
-                            "total compare ${AppData.compareList.length.toString()}");
-
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
+                              print(
+                                  "total compare ${AppData.compareList.length.toString()}");
                               if (AppData.compareList.length < 4) {
-                                AppData.compareList.add(widget.product.mobile);
-                                return AlertDialog(
-                                  title: Row(
-                                    children: <Widget>[
-                                      Text(
-                                        'Mobiles in Compare list ',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                      Text(
-                                          AppData.compareList.length.toString(),
-                                          style: TextStyle(fontSize: 15)),
-                                    ],
-                                  ),
-                                  content: FlatButton(
-                                    onPressed: () {
-                                      List<DocumentSnapshot> list =
-                                          AppData.compareList;
-                                      // AppData.compareList.clear();
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => Comparison(
-                                                    compareList: list,
-                                                  )));
-                                    },
-                                    child: Text('Compare Now'),
-                                    color: Colors.green,
-                                  ),
-                                );
+                                Provider.of<ComparisonProvider>(context,
+                                        listen: false)
+                                    .addItemInList(widget.product.mobile);
+                                AppData.compareListNames
+                                    .add(widget.product.name);
+                                setState(() {
+                                  checkCompare = true;
+                                  AppData.compareList
+                                      .add(widget.product.mobile);
+                                });
                               } else {
-                                return AlertDialog(
-                                  title: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Text(
-                                          'you Compare more then 4 mobiles ',
-                                          style: TextStyle(fontSize: 15),
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Row(
+                                          children: <Widget>[
+                                            Expanded(
+                                              child: Text(
+                                                'you Compare more then 4 mobiles ',
+                                                style: TextStyle(fontSize: 15),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  content: FlatButton(
-                                    onPressed: () {
-                                      List<DocumentSnapshot> list =
-                                          AppData.compareList;
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                              builder: (context) => Comparison(
-                                                    compareList: list,
-                                                  )));
-                                    },
-                                    child: Text('Compare Now'),
-                                    color: Colors.green,
-                                  ),
-                                );
+                                        content: FlatButton(
+                                          onPressed: () {
+                                            List<DocumentSnapshot> list =
+                                                AppData.compareList;
+                                            Navigator.pop(context);
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Comparison(
+                                                          compareList: list,
+                                                        )));
+                                          },
+                                          child: Text('Compare Now'),
+                                          color: Colors.green,
+                                        ),
+                                      );
+                                    });
                               }
-                            });
-                      },
-                      child: Container(
-                        height: 30,
-                        width: 70,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFF6969),
-                          borderRadius: BorderRadius.circular(100),
-                        ),
-                        padding: EdgeInsets.only(top: 4, bottom: 4, left: 5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Compare',
-                              key: key,
-                              style: TextStyle(
-                                fontFamily: 'NeusaNextPro',
-                                color: Colors.white,
+                            },
+                            child: Container(
+                              height: 25,
+                              width: 65,
+                              margin: EdgeInsets.only(top: 5),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFFF6969),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              padding:
+                                  EdgeInsets.only(top: 4, bottom: 4, left: 5),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'Compare',
+                                    key: key,
+                                    style: TextStyle(
+                                      fontFamily: 'NeusaNextPro',
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    )
+                          )
                   ],
                 ),
               ),

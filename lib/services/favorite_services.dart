@@ -16,6 +16,16 @@ Stream<List<FavoriteModal>> get allFavorite {
   return favCollection.snapshots().map(_favoriteListFromSnapshot);
 }
 
+CollectionReference compareCollection =
+    Firestore.instance.collection('favoriteCompare');
+Stream<QuerySnapshot> get favoriteCompare {
+  return compareCollection.snapshots();
+}
+
+Stream<QuerySnapshot> allFavoriteCompareQuery(String id) {
+  return compareCollection.where('user_id', isEqualTo: id).snapshots();
+}
+
 CollectionReference mobilesCollection =
     Firestore.instance.collection('mobiles');
 

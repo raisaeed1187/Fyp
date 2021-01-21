@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterfirebase/modal/data.dart';
 
 class FullComparison extends StatefulWidget {
   List<DocumentSnapshot> compareList;

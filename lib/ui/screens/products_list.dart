@@ -59,15 +59,18 @@ class _ProductListState extends State<ProductList> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      AppData.filterMobiles = mobilesList;
-    });
+
+    // setState(() {
+    //   AppData.filterMobiles = mobilesList;
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    print("length in product page: ${AppData.filterMobiles.length}");
+    Future.delayed(Duration(seconds: 5))
+        .then((value) => AppData.filterMobiles.clear());
+    print("length in product page: ${mobilesList.length}");
     /*24 is for notification bar on Android*/
     final double itemHeight = (size.height - kToolbarHeight - 24) / 3;
     final double itemWidth = size.width / 2;
@@ -99,7 +102,7 @@ class _ProductListState extends State<ProductList> {
                 hintStyle: TextStyle(
                     color: Color(0x40515C6F), fontFamily: 'NeusaNextPro'),
                 hintText: "Search Mobiles"),
-            searchList: AppData.filterMobiles,
+            searchList: mobilesList,
             searchQueryBuilder: (query, list) {
               return list
                   .where((item) => item['product_name']
@@ -249,19 +252,19 @@ class _ProductListState extends State<ProductList> {
                   return Text('no data');
                 }
                 return ListView.builder(
-                    itemCount: AppData.filterMobiles.length,
+                    itemCount: mobilesList.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (context, index) {
-                      DocumentSnapshot mobile = AppData.filterMobiles[index];
+                      DocumentSnapshot mobile = mobilesList?.elementAt(index);
                       return ProductCard(
                         product: Product(
-                          company: mobile['brand'],
-                          name: mobile['product_name'],
-                          icon: mobile['product_image'],
+                          company: mobile['brand'] ?? "",
+                          name: mobile['product_name'] ?? "",
+                          icon: mobile['product_image'] ?? "",
                           rating: 4.5,
                           remainingQuantity: 5,
-                          price: 'Rs ${mobile['price']}',
-                          mobile: mobile,
+                          price: 'Rs ${mobile['price']}' ?? "",
+                          mobile: mobile ?? "",
                         ),
                         gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
                       );
