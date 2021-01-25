@@ -146,6 +146,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             print('favorite : ${AppData.favoriteMobiles}');
                             dynamic result = await _auth
                                 .signInWithEmailAndPassword(email, password);
+                            progressDialog.show();
+                            Future.delayed(const Duration(seconds: 1), () {
+                              print(
+                                  'favorite : ${AppData.favoriteMobiles.length}');
+
+                              setState(() {
+                                progressDialog.hide();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Home(),
+                                  ),
+                                );
+                              });
+                            });
                             if (result == null) {
                               setState(() {
                                 error =
@@ -177,20 +192,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 //       print('signed in');
                 //       print(result.uid);
                 //     }
-                //     // progressDialog.show();
-                //     // Future.delayed(const Duration(seconds: 2), () {
-                //     //   print('favorite : ${AppData.favoriteMobiles.length}');
+                // progressDialog.show();
+                // Future.delayed(const Duration(seconds: 2), () {
+                //   print('favorite : ${AppData.favoriteMobiles.length}');
 
-                //     //   setState(() {
-                //     //     progressDialog.hide();
-                //     //     Navigator.pushReplacement(
-                //     //       context,
-                //     //       MaterialPageRoute(
-                //     //         builder: (context) => Home(),
-                //     //       ),
-                //     //     );
-                //     //   });
-                //     // });
+                //   setState(() {
+                //     progressDialog.hide();
+                //     Navigator.pushReplacement(
+                //       context,
+                //       MaterialPageRoute(
+                //         builder: (context) => Home(),
+                //       ),
+                //     );
+                //   });
+                // });
                 //   },
                 // ),
                 Padding(

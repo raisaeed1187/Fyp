@@ -9,9 +9,19 @@ class AppData {
   static List<DocumentSnapshot> filterMobiles = [];
   static List<DocumentSnapshot> favoriteMobiles = [];
   static List<ComparisonMobileModal> previousComparisonsList = [];
+  static List<DocumentSnapshot> recentMobiles = [];
+  static List<int> battries = [];
+  static List<String> rams = [];
+  static List<String> brands = [];
+  static int minPrice = 3000;
+  static int maxPrice = 500000;
+
   static List<String> compareListNames = [];
   static String activeUserId = "";
   static String activeUserName = "";
+  static String activeUserImage = "";
+  static String activeUserEmail = "";
+
   static List<Product> productList = [
     Product(
         id: 1,

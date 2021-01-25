@@ -4,14 +4,17 @@ import 'package:flutter_icons/feather.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/PageSearch.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:flutterfirebase/modal/user.dart';
 import 'package:flutterfirebase/services/auth.dart';
+import 'package:flutterfirebase/services/database.dart';
 import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/screens/checkout.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/screens/login.dart';
 import 'package:flutterfirebase/ui/screens/previous_compares.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
+import 'package:flutterfirebase/ui/screens/profile.dart';
 import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
 import 'package:flutterfirebase/ui/utils/navigator.dart';
@@ -26,10 +29,18 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
   final AuthService _auth = AuthService();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData>(context);
     setState(() {
       AppData.activeUserName = userData.name;
+      AppData.activeUserImage = userData.picUrl;
+      AppData.activeUserEmail = userData.email;
     });
     print(userData);
     Color blackColor = Colors.black.withOpacity(0.6);
@@ -48,8 +59,8 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                 ),
                 subtitle: GestureDetector(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => UserSettings()));
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => ProfilePage()));
                     // Navigator.push(
                     //   context,
                     //   PageTransition(
@@ -145,6 +156,34 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
             },
           ),
           ListTile(
+            trailing: Container(
+              padding: EdgeInsets.symmetric(horizontal: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Color(0xFFFB7C7A),
+              ),
+              child: Text(
+                AppData.recentMobiles.length.toString() ?? "0",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            leading: Icon(Icons.mobile_screen_share, color: Colors.black54),
+            title: Text('Recently Viewed',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black54)),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ProductList(
+                        mobilesList: AppData.recentMobiles,
+                      )));
+            },
+          ),
+          ListTile(
             leading: Icon(Feather.getIconData('search'), color: blackColor),
             title: Text('Search',
                 style: TextStyle(
@@ -176,7 +215,8 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                     fontWeight: FontWeight.w600,
                     color: blackColor)),
             onTap: () {
-              Nav.route(context, Checkout());
+              // Nav.route(context, Checkout());
+              DatabaseService().giveScore();
             },
           ),
 

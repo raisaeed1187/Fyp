@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:flutterfirebase/modal/user.dart';
 import 'package:flutterfirebase/services/database.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
@@ -29,12 +30,7 @@ class _WrapperState extends State<Wrapper> {
       setState(() {
         AppData.activeUserId = user.uid;
       });
-      // progressDialog.show();
-      // Future.delayed(const Duration(seconds: 2), () {
-      //   setState(() {
-      //     progressDialog.hide();
-      //   });
-      // });
+
       return Home(uid: user.uid);
     }
   }

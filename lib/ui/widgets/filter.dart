@@ -50,7 +50,7 @@ class _FiltreState extends State<Filtre> {
   int maxPrice = 100000;
   List<int> allBattries = [2500, 3000, 3500, 4000, 4500, 5000];
   List<String> allrams = ['2 GB', '3 GB', '4 GB', '5 GB', '6 GB'];
-  List<bool> ramList = [false, false, false, false, false];
+  List<bool> ramList = [false, false, false, false, false, false];
   applyFilters() async {
     AppData.filterMobiles.clear();
     print(allBrands.length);
@@ -61,8 +61,8 @@ class _FiltreState extends State<Filtre> {
           // .where('battery_size',
           //     isGreaterThanOrEqualTo:
           //         batteries.isEmpty ? null : batteries[0] - 500)
-          .where('battery_size',
-              isEqualTo: batteries.isEmpty ? null : batteries[0])
+          // .where('battery_size',
+          //     isEqualTo: batteries.isEmpty ? null : batteries[0])
           .where('brand', whereIn: brands.isEmpty ? null : brands)
           // .where('ram', isEqualTo: '2 GB')
           .where('ram', isEqualTo: rams.isEmpty ? null : rams[i])
@@ -210,7 +210,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox25 = !_checkbox25;
                                   if (_checkbox25 == true) {
                                     batteries.add(2500);
+                                    AppData.battries.add(2500);
                                   } else {
+                                    AppData.battries.remove(2500);
                                     batteries.remove(2500);
                                   }
                                 });
@@ -234,7 +236,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox30 = !_checkbox30;
                                   if (_checkbox30 == true) {
                                     batteries.add(3000);
+                                    AppData.battries.add(3000);
                                   } else {
+                                    AppData.battries.remove(3000);
                                     batteries.remove(3000);
                                   }
                                 });
@@ -258,7 +262,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox35 = !_checkbox35;
                                   if (_checkbox35 == true) {
                                     batteries.add(3500);
+                                    AppData.battries.add(3500);
                                   } else {
+                                    AppData.battries.remove(3500);
                                     batteries.remove(3500);
                                   }
                                 });
@@ -282,7 +288,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox40 = !_checkbox40;
                                   if (_checkbox40 == true) {
                                     batteries.add(4000);
+                                    AppData.battries.add(4000);
                                   } else {
+                                    AppData.battries.remove(4000);
                                     batteries.remove(4000);
                                   }
                                 });
@@ -307,7 +315,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox45 = !_checkbox45;
                                   if (_checkbox45 == true) {
                                     batteries.add(4500);
+                                    AppData.battries.add(4500);
                                   } else {
+                                    AppData.battries.remove(4500);
                                     batteries.remove(4500);
                                   }
                                 });
@@ -331,7 +341,9 @@ class _FiltreState extends State<Filtre> {
                                   _checkbox50 = !_checkbox50;
                                   if (_checkbox50 == true) {
                                     batteries.add(5000);
+                                    AppData.battries.add(5000);
                                   } else {
+                                    AppData.battries.remove(5000);
                                     batteries.remove(5000);
                                   }
                                 });
@@ -370,7 +382,9 @@ class _FiltreState extends State<Filtre> {
                                   ramList[0] = value;
                                   if (ramList[0] == true) {
                                     rams.add('2 GB');
+                                    AppData.rams.add('2 GB');
                                   } else {
+                                    AppData.rams.remove('2 GB');
                                     rams.remove('2 GB');
                                   }
                                 });
@@ -394,7 +408,9 @@ class _FiltreState extends State<Filtre> {
                                   ramList[1] = value;
                                   if (ramList[1] == true) {
                                     rams.add('3 GB');
+                                    AppData.rams.add('3 GB');
                                   } else {
+                                    AppData.rams.remove('3 GB');
                                     rams.remove('3 GB');
                                   }
                                 });
@@ -418,7 +434,9 @@ class _FiltreState extends State<Filtre> {
                                   ramList[2] = value;
                                   if (ramList[2] == true) {
                                     rams.add('4 GB');
+                                    AppData.rams.add('4 GB');
                                   } else {
+                                    AppData.rams.remove('4 GB');
                                     rams.remove('4 GB');
                                   }
                                 });
@@ -428,30 +446,6 @@ class _FiltreState extends State<Filtre> {
                             ),
                           ),
                           Text('4 GB'),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: 30,
-                            child: Checkbox(
-                              value: ramList[3],
-                              activeColor: Theme.of(context).primaryColor,
-                              onChanged: (value) {
-                                setState(() {
-                                  ramList[3] = !ramList[3];
-                                  if (_checkbox5 == true) {
-                                    rams.add('5 GB');
-                                  } else {
-                                    rams.remove('5 GB');
-                                  }
-                                });
-                              },
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                            ),
-                          ),
-                          Text('5 GB'),
                         ],
                       ),
                       Row(
@@ -467,7 +461,9 @@ class _FiltreState extends State<Filtre> {
                                   ramList[4] = !ramList[4];
                                   if (ramList[4] == true) {
                                     rams.add('6 GB');
+                                    AppData.rams.add('6 GB');
                                   } else {
+                                    AppData.rams.remove('6 GB');
                                     rams.remove('6 GB');
                                   }
                                 });
@@ -476,7 +472,59 @@ class _FiltreState extends State<Filtre> {
                                   MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
-                          Text('6 GB & Above'),
+                          Text('6 GB'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            child: Checkbox(
+                              value: ramList[3],
+                              activeColor: Theme.of(context).primaryColor,
+                              onChanged: (value) {
+                                setState(() {
+                                  ramList[3] = !ramList[3];
+                                  if (_checkbox5 == true) {
+                                    rams.add('8 GB');
+                                    AppData.rams.add('8 GB');
+                                  } else {
+                                    AppData.rams.remove('8 GB');
+                                    rams.remove('8 GB');
+                                  }
+                                });
+                              },
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                          Text('8 GB'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            height: 30,
+                            child: Checkbox(
+                              value: ramList[5],
+                              activeColor: Theme.of(context).primaryColor,
+                              onChanged: (value) {
+                                setState(() {
+                                  ramList[5] = !ramList[5];
+                                  if (ramList[5] == true) {
+                                    rams.add('12 GB');
+                                    AppData.rams.add('12 GB');
+                                  } else {
+                                    AppData.rams.remove('12 GB');
+                                    rams.remove('12 GB');
+                                  }
+                                });
+                              },
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ),
+                          Text('12 GB & Above'),
                         ],
                       ),
                     ],
@@ -536,9 +584,12 @@ class _FiltreState extends State<Filtre> {
                   // int lower = _lowerValue;
                   int lower = _lowerValue.round();
                   int upper = _upperValue.round();
+
                   setState(() {
                     minPrice = lowerValue.round();
                     maxPrice = upperValue.round();
+                    AppData.minPrice = lower;
+                    AppData.maxPrice = upper;
                   });
                   print("lower :${lower.toString()}");
                   print("upper :${upper.toString()}");
@@ -554,7 +605,7 @@ class _FiltreState extends State<Filtre> {
                     print("total filter: ${AppData.mobilesList.length}");
 
                     // if (brands.isNotEmpty) {
-                    await applyFilters();
+                    // await applyFilters();
                     print("total filter: ${AppData.filterMobiles.length}");
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
@@ -637,8 +688,10 @@ class _filterChipWidgetState extends State<filterChipWidget> {
           _isSelected = isSelected;
           if (_isSelected == true) {
             widget.brands.add(widget.chipName);
+            AppData.brands.add(widget.chipName);
           } else {
             widget.brands.remove(widget.chipName);
+            AppData.brands.remove(widget.chipName);
           }
         });
       },

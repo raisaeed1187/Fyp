@@ -74,11 +74,11 @@ class _ProductListState extends State<ProductList> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     final comparisonProvider = context.watch<ComparisonProvider>();
-    if (AppData.compareList.length == 0) {
-      comparisonProvider.clearCompareList();
-    }
-    Future.delayed(Duration(seconds: 5))
-        .then((value) => AppData.filterMobiles.clear());
+    // if (AppData.compareList.length == 0) {
+    //   comparisonProvider.clearCompareList();
+    // }
+    // Future.delayed(Duration(seconds: 5))
+    //     .then((value) => AppData.filterMobiles.clear());
     print("length in product page: ${mobilesList.length}");
     /*24 is for notification bar on Android*/
     final double itemHeight = (size.height - kToolbarHeight - 24) / 3;
@@ -86,57 +86,64 @@ class _ProductListState extends State<ProductList> {
     return Scaffold(
       // key: _scaffoldKey,
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.only(top: 20, bottom: 5),
-          child: GFSearchBar(
-            searchBoxInputDecoration: InputDecoration(
-                contentPadding: EdgeInsets.only(top: 0, bottom: 0, right: 30),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                    width: 0,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  borderSide: BorderSide(
-                    color: Colors.transparent,
-                    width: 0,
-                  ),
-                ),
-                fillColor: Color(0x20727C8E),
-                filled: true,
-                prefixIcon: Icon(Icons.search, color: Color(0x40515C6F)),
-                hintStyle: TextStyle(
-                    color: Color(0x40515C6F), fontFamily: 'NeusaNextPro'),
-                hintText: "Search Mobiles"),
-            searchList: mobilesList,
-            searchQueryBuilder: (query, list) {
-              return list
-                  .where((item) => item['product_name']
-                      .toLowerCase()
-                      .contains(query.toLowerCase()))
-                  .toList();
-            },
-            noItemsFoundWidget: Text('No record found s'),
-            hideSearchBoxWhenItemSelected: false,
-            overlaySearchListItemBuilder: (item) {
-              return Container(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  item['product_name'],
-                  style: const TextStyle(fontSize: 18),
-                ),
-              );
-            },
-            onItemSelected: (item) {
-              if (item != null) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProductDetails(mobile: item)));
-              }
-            },
-          ),
+        title: Stack(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 5),
+              child: GFSearchBar(
+                searchBoxInputDecoration: InputDecoration(
+                    contentPadding:
+                        EdgeInsets.only(top: 0, bottom: 0, right: 30),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                        width: 0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(100),
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                        width: 0,
+                      ),
+                    ),
+                    fillColor: Color(0x20727C8E),
+                    filled: true,
+                    prefixIcon: Icon(Icons.search, color: Color(0x40515C6F)),
+                    hintStyle: TextStyle(
+                        color: Color(0x40515C6F), fontFamily: 'NeusaNextPro'),
+                    hintText: "Search Mobiles"),
+                searchList: mobilesList,
+                searchQueryBuilder: (query, list) {
+                  return list
+                      .where((item) => item['product_name']
+                          .toLowerCase()
+                          .contains(query.toLowerCase()))
+                      .toList();
+                },
+                noItemsFoundWidget: Text('No record found s'),
+                hideSearchBoxWhenItemSelected: false,
+                overlaySearchListItemBuilder: (item) {
+                  return Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      item['product_name'],
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  );
+                },
+                onItemSelected: (item) {
+                  if (item != null) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ProductDetails(mobile: item)));
+                  }
+                },
+              ),
+            ),
+          ],
+          overflow: Overflow.visible,
+          fit: StackFit.loose,
         ),
         // title: Text(
         //   "MobHub",
@@ -145,8 +152,13 @@ class _ProductListState extends State<ProductList> {
         leading: IconButton(
           icon:
               Icon(Ionicons.getIconData("ios-arrow-back"), color: Colors.black),
-          onPressed: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => Home())),
+          onPressed: () {
+            AppData.brands.clear();
+            AppData.rams.clear();
+            AppData.battries.clear();
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => Home()));
+          },
         ),
         actions: <Widget>[
           GestureDetector(
@@ -215,7 +227,29 @@ class _ProductListState extends State<ProductList> {
               ),
             ),
           ),
-          Text(''),
+          AppData.brands.isNotEmpty ||
+                  AppData.rams.isNotEmpty ||
+                  AppData.battries.isNotEmpty
+              ? IconButton(
+                  icon: Icon(
+                    Icons.cancel,
+                    color: Colors.red,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    AppData.brands.clear();
+                    AppData.rams.clear();
+                    AppData.battries.clear();
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => ProductList(
+                              mobilesList: AppData.mobilesList,
+                            )));
+                  },
+                )
+              : Text(''),
+          // Stack(
+          //   children: <Widget>[Positioned(top: 30, child: Text('filter'))],
+          // ),
           // Padding(
           //   padding: const EdgeInsets.only(right: 24.0),
           //   child: SizedBox(
@@ -246,7 +280,7 @@ class _ProductListState extends State<ProductList> {
         controller: slidingUpController,
         minHeight: 42,
         maxHeight: MediaQuery.of(context).size.height / 1,
-        color: Colors.blueGrey,
+        color: Colors.blueAccent,
         panel: Filtre(),
         collapsed: Container(
           decoration:
@@ -271,13 +305,169 @@ class _ProductListState extends State<ProductList> {
         ),
         borderRadius: radius,
         body: Container(
-          padding: EdgeInsets.only(top: 18),
-          child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                buildTrending(),
-              ],
-            ),
+          // padding: EdgeInsets.only(top: 18),
+          // color: Colors.black,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              AppData.brands.isNotEmpty ||
+                      AppData.rams.isNotEmpty ||
+                      AppData.battries.isNotEmpty
+                  ? Stack(
+                      overflow: Overflow.visible,
+                      children: <Widget>[
+                        Container(
+                          color: Color(0xFFFF6969),
+                          height: 35,
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: ListView(
+                            // mainAxisAlignment: MainAxisAlignment.start,
+                            scrollDirection: Axis.horizontal,
+                            shrinkWrap: true,
+                            children: <Widget>[
+                              AppData.brands.isNotEmpty
+                                  ? Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Text(
+                                            'Brand:',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: List.generate(
+                                                AppData.brands.length, (index) {
+                                              return Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.amberAccent),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5, vertical: 3),
+                                                // height: 20,
+                                                child: Center(
+                                                  child: Text(
+                                                    AppData.brands[index],
+                                                    style: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Text(''), //end brands filters
+                              AppData.rams.isNotEmpty
+                                  ? Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Text(
+                                            'Ram: ',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: List.generate(
+                                                AppData.rams.length, (index) {
+                                              return Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.amberAccent),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5, vertical: 3),
+                                                // height: 20,
+                                                child: Center(
+                                                  child: Text(
+                                                    AppData.rams[index],
+                                                    style: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Text(''),
+                              AppData.battries.isNotEmpty
+                                  ? Container(
+                                      margin: EdgeInsets.only(left: 5),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Text(
+                                            'Battery: ',
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: List.generate(
+                                                AppData.battries.length,
+                                                (index) {
+                                              return Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 5),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.amberAccent),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5, vertical: 3),
+                                                // height: 20,
+                                                child: Center(
+                                                  child: Text(
+                                                    AppData.battries[index]
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Text(''),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(''),
+              SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    buildTrending(),
+                  ],
+                ),
+              ),
+            ],
           ),
           // child: StreamBuilder(
           //     stream: Firestore.instance.collection('mobiles').snapshots(),
@@ -328,22 +518,231 @@ class _ProductListState extends State<ProductList> {
                   return Text('no data');
                 }
                 return ListView.builder(
-                    itemCount: mobilesList.length,
+                    itemCount: AppData.brands.isNotEmpty ||
+                            AppData.rams.isNotEmpty ||
+                            AppData.battries.isNotEmpty
+                        ? snapshot.data.documents.length
+                        : mobilesList.length,
                     scrollDirection: Axis.vertical,
                     itemBuilder: (context, index) {
-                      DocumentSnapshot mobile = mobilesList?.elementAt(index);
-                      return ProductCard(
-                        product: Product(
-                          company: mobile['brand'] ?? "",
-                          name: mobile['product_name'] ?? "",
-                          icon: mobile['product_image'] ?? "",
-                          rating: 4.5,
-                          remainingQuantity: 5,
-                          price: 'Rs ${mobile['price']}' ?? "",
-                          mobile: mobile ?? "",
-                        ),
-                        gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
-                      );
+                      DocumentSnapshot mobile = AppData.brands.isNotEmpty ||
+                              AppData.rams.isNotEmpty ||
+                              AppData.battries.isNotEmpty
+                          ? snapshot.data.documents?.elementAt(index)
+                          : mobilesList?.elementAt(index);
+                      if (AppData.brands.isNotEmpty ||
+                          AppData.rams.isNotEmpty ||
+                          AppData.battries.isNotEmpty) {
+                        //check brands, batties, rams length
+                        if ((AppData.brands.isNotEmpty &&
+                                AppData.brands.contains(mobile['brand'])) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isEmpty) &&
+                            (AppData.battries.isEmpty)) {
+                          //brand filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end brand filter
+                        if ((AppData.brands.isEmpty) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isNotEmpty &&
+                                AppData.rams.contains(mobile['ram'])) &&
+                            (AppData.battries.isEmpty)) {
+                          //check ram filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end rams filter
+                        if ((AppData.brands.isEmpty) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isEmpty) &&
+                            (AppData.battries.isNotEmpty &&
+                                AppData.battries
+                                    .contains(mobile['battery_size']))) {
+                          //check battery filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end battery filter
+                        if ((AppData.brands.isEmpty) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isNotEmpty &&
+                                AppData.rams.contains(mobile['ram'])) &&
+                            (AppData.battries.isNotEmpty &&
+                                AppData.battries
+                                    .contains(mobile['battery_size']))) {
+                          //check battery and ram filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end battery and ram filter
+                        if ((AppData.brands.isNotEmpty &&
+                                AppData.brands.contains(mobile['brand'])) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isEmpty) &&
+                            (AppData.battries.isNotEmpty &&
+                                AppData.battries
+                                    .contains(mobile['battery_size']))) {
+                          //check battery and brand filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end battery and brand filter
+                        if ((AppData.brands.isNotEmpty &&
+                                AppData.brands.contains(mobile['brand'])) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice) &&
+                            (AppData.rams.isNotEmpty &&
+                                AppData.rams.contains(mobile['ram'])) &&
+                            (AppData.battries.isNotEmpty &&
+                                AppData.battries
+                                    .contains(mobile['battery_size']))) {
+                          //check brand, brand and battery filter
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } //end brand, ram and battery filter
+                        if ((AppData.brands.isNotEmpty &&
+                                AppData.brands.contains(mobile['brand'])) &&
+                            (AppData.rams.isNotEmpty &&
+                                AppData.rams.contains(mobile['ram'])) &&
+                            (mobile['price'] >= AppData.minPrice &&
+                                mobile['price'] <= AppData.maxPrice)) {
+                          //check brand and rams
+                          return ProductCard(
+                            product: Product(
+                              company: mobile['brand'] ?? "",
+                              name: mobile['product_name'] ?? "",
+                              icon: mobile['product_image'] ?? "",
+                              rating: 4.5,
+                              price: 'Rs ${mobile['price']}' ?? "",
+                              mobile: mobile ?? "",
+                            ),
+                            gradientColors: [
+                              Color(0XFFa466ec),
+                              Colors.purple[400]
+                            ],
+                          );
+                        } else {
+                          return SizedBox(
+                            height: 1,
+                          );
+                        } //end brand, ram filter
+                      } else {
+                        return ProductCard(
+                          product: Product(
+                            company: mobile['brand'] ?? "",
+                            name: mobile['product_name'] ?? "",
+                            icon: mobile['product_image'] ?? "",
+                            rating: 4.5,
+                            remainingQuantity: 5,
+                            price: 'Rs ${mobile['price']}' ?? "",
+                            mobile: mobile ?? "",
+                          ),
+                          gradientColors: [
+                            Color(0XFFa466ec),
+                            Colors.purple[400]
+                          ],
+                        );
+                      }
+                      // return AppData.rams.isNotEmpty &&
+                      //         AppData.rams.contains(mobile['ram'])
+                      //     // ? AppData.minPrice >= mobile['price'] &&
+                      //     //         AppData.maxPrice <= mobile['price']
+                      // return ProductCard(
+                      //   product: Product(
+                      //     company: mobile['brand'] ?? "",
+                      //     name: mobile['product_name'] ?? "",
+                      //     icon: mobile['product_image'] ?? "",
+                      //     rating: 4.5,
+                      //     remainingQuantity: 5,
+                      //     price: 'Rs ${mobile['price']}' ?? "",
+                      //     mobile: mobile ?? "",
+                      //   ),
+                      //   gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
+                      // );
+
+                      // : SizedBox(
+                      //     height: 1,
+                      //   )
+                      // : SizedBox(
+                      //     height: 1,
+                      //   )
+                      // : SizedBox(
+                      //     height: 1,
+                      //   );
                     });
               }),
         )

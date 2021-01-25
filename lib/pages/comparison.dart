@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/comparisonMobileModal.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
+import 'package:flutterfirebase/product_details.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
 import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
@@ -112,7 +114,6 @@ class _ComparisonState extends State<Comparison> {
   void sortMobile() {
     int scoreTemp;
     DocumentSnapshot mobTemp;
-
     for (int i = 0; i < mobilesScore.length; i++) {
       for (int j = i + 1; j < mobilesScore.length; j++) {
         if (mobilesScore[i] < mobilesScore[j]) {
@@ -188,7 +189,7 @@ class _ComparisonState extends State<Comparison> {
   @override
   void initState() {
     super.initState();
-    getScore();
+    // getScore();
     sortMobile();
     addInPreviousList();
     // print("screen size: ${getScreenSize(0, 'display', 3)}");
@@ -218,6 +219,59 @@ class _ComparisonState extends State<Comparison> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          // centerTitle: true,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Expanded(
+            child: Row(
+              children: List.generate(compareList.length, (index) {
+                return Container(
+                  child: Expanded(
+                    child: Text(
+                      compareList[index]['product_name'],
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NeusaNextPro',
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          titleSpacing: 0,
+          leading: IconButton(
+              icon:
+                  Icon(Icons.chevron_left, color: Color(0xFFFF6969), size: 30),
+              onPressed: () {
+                // Navigator.of(context).pop();
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Home()));
+                AppData.compareList.clear();
+                AppData.compareListNames.clear();
+                final comparisonProvider = context.watch<ComparisonProvider>();
+                comparisonProvider.clearCompareList();
+              }),
+          actions: <Widget>[
+            Container(
+              height: 40,
+              width: 40,
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  StreamProvider<QuerySnapshot>.value(
+                    value: favoriteCompare,
+                    child: FavoriteCompareWidget(
+                      compareList: compareList,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(5.0),
@@ -230,77 +284,76 @@ class _ComparisonState extends State<Comparison> {
                     child: Container(
                       child: Column(
                         children: [
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: IconButton(
-                                          icon: Icon(Ionicons.getIconData(
-                                              "ios-arrow-back")),
-                                          onPressed: () {
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Home()));
-                                            AppData.compareList.clear();
-                                            AppData.compareListNames.clear();
-                                            final comparisonProvider = context
-                                                .watch<ComparisonProvider>();
-                                            comparisonProvider
-                                                .clearCompareList();
-                                            // Navigator.of(context).pop();
-                                          },
-                                        )),
-                                    Expanded(
-                                      child: Row(
-                                        children: List.generate(
-                                            compareList.length, (index) {
-                                          return Container(
-                                            child: Expanded(
-                                              child: Text(
-                                                compareList[index]
-                                                    ['product_name'],
-                                                style: TextStyle(
-                                                  fontSize: 18,
-//                        fontWeight: FontWeight.bold,
-                                                  fontFamily: 'NeusaNextPro',
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }),
-//
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Container(
-                                        width: 30,
-                                        height: 20,
-                                        child:
-                                            StreamProvider<QuerySnapshot>.value(
-                                          value: favoriteCompare,
-                                          child: FavoriteCompareWidget(
-                                            compareList: compareList,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                          // Container(
+                          //   width: double.infinity,
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.grey[200],
+                          //   ),
+                          //   child: Padding(
+                          //     padding: const EdgeInsets.all(8.0),
+                          //     child: Container(
+                          //       child: Row(
+                          //         mainAxisAlignment:
+                          //             MainAxisAlignment.spaceBetween,
+                          //         children: [
+                          //           Align(
+                          //               alignment: Alignment.centerLeft,
+                          //               child: IconButton(
+                          //                 icon: Icon(Ionicons.getIconData(
+                          //                     "ios-arrow-back")),
+                          //                 onPressed: () {
+                          //                   Navigator.of(context).push(
+                          //                       MaterialPageRoute(
+                          //                           builder: (context) =>
+                          //                               Home()));
+                          //                   AppData.compareList.clear();
+                          //                   AppData.compareListNames.clear();
+                          //                   final comparisonProvider = context
+                          //                       .watch<ComparisonProvider>();
+                          //                   comparisonProvider
+                          //                       .clearCompareList();
+                          //                   // Navigator.of(context).pop();
+                          //                 },
+                          //               )),
+                          //           Expanded(
+                          //             child: Row(
+                          //               children: List.generate(
+                          //                   compareList.length, (index) {
+                          //                 return Container(
+                          //                   child: Expanded(
+                          //                     child: Text(
+                          //                       compareList[index]
+                          //                           ['product_name'],
+                          //                       style: TextStyle(
+                          //                         fontSize: 18,
+                          //                         fontFamily: 'NeusaNextPro',
+                          //                       ),
+                          //                     ),
+                          //                   ),
+                          //                 );
+                          //               }),
+                          //             ),
+                          //           ),
+                          //           Align(
+                          //             alignment: Alignment.centerRight,
+                          //             child: Container(
+                          //               width: 30,
+                          //               height: 20,
+                          //               child:
+                          //                   StreamProvider<QuerySnapshot>.value(
+                          //                 value: favoriteCompare,
+                          //                 child: FavoriteCompareWidget(
+                          //                   compareList: compareList,
+                          //                 ),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
+
                           Container(
                             width: double.infinity,
 //                            height: 80.0,
@@ -311,10 +364,22 @@ class _ComparisonState extends State<Comparison> {
                             child: Column(
                               children:
                                   List.generate(compareList.length, (index) {
-                                return CompareMobile(
-                                  image: compareList[index]['product_image'],
-                                  name: compareList[index]['product_name'],
-                                  price: compareList[index]['price'].toString(),
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => ProductDetails(
+                                          mobile: compareList[index],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: CompareMobile(
+                                    image: compareList[index]['product_image'],
+                                    name: compareList[index]['product_name'],
+                                    price:
+                                        compareList[index]['price'].toString(),
+                                  ),
                                 );
                               }),
                             ),

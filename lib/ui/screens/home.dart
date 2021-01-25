@@ -8,6 +8,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/PageSearch.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:flutterfirebase/modal/user.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
@@ -20,6 +21,7 @@ import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/painters/circlepainters.dart';
 import 'package:flutterfirebase/ui/screens/favorites_list.dart';
 import 'package:flutterfirebase/ui/screens/products_list.dart';
+import 'package:flutterfirebase/ui/screens/profile.dart';
 // import 'package:flutterfirebase/ui/screens/search.dart';
 import 'package:flutterfirebase/ui/screens/shoppingcart.dart';
 import 'package:flutterfirebase/ui/screens/usersettings.dart';
@@ -68,7 +70,7 @@ class _HomeState extends State<Home> {
 
     fetchData();
     // print('favorite in home:${AppData.favoriteMobiles.length}');
-
+    DatabaseService().giveScore();
     super.initState();
   }
 
@@ -77,13 +79,12 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     // final userData = Provider.of<UserData>(context);
-    // print(userData);
+    // print('total mobiles: ${AppData.mobilesList.length}');
     print('previous list: ${AppData.previousComparisonsList.length}');
-    if (AppData.compareList.length == 0) {
-      final comparisonProvider = context.watch<ComparisonProvider>();
-      comparisonProvider.clearCompareList();
-    }
-
+    // if (AppData.compareList.length == 0) {
+    //   final comparisonProvider = context.watch<ComparisonProvider>();
+    //   comparisonProvider.clearCompareList();
+    // }
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
       child: DefaultTabController(
@@ -147,7 +148,7 @@ class _HomeState extends State<Home> {
                           'Oppo',
                           'Infinix',
                           'Realme',
-                          'Techno',
+                          'Tecno',
                           'Vivo',
                           'Huawei',
                           'Xiaomi'
@@ -238,7 +239,7 @@ class _HomeState extends State<Home> {
               ),
               PageSearch(),
               FavoriteComparesList(),
-              UserSettings(),
+              ProfilePage(),
             ],
           ),
         ),

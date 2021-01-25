@@ -7,5 +7,6 @@ class UserData {
   final String uid;
   final String name;
   final String picUrl;
-  UserData({this.uid, this.name, this.picUrl});
+  final String email;
+  UserData({this.uid, this.name, this.picUrl, this.email});
 }
