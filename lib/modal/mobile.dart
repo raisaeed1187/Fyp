@@ -22,9 +22,8 @@ class Mobile {
   String brand;
   String price;
   String image;
-  static int score = 75;
+  static int score = 5;
   Mobile({this.name, this.brand, this.image});
-
   int getNumber(String feature, int endPoint) {
     return int.parse(RegExp(r'(\d+)')
         .allMatches(feature.toString())

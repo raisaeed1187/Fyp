@@ -30,6 +30,9 @@ dependencies:
   firebase_core: ^0.4.0
   cloud_firestore: ^0.12.9+4
   firebase_auth: ^0.14.0+5
+  firebase_storage: ^3.0.0
+  image_picker: ^0.6.7+21
+  permission_handler: ^5.0.1+1
   font_awesome_flutter: ^8.8.1
   transparent_image: ^0.1.0
   flutter_spinkit: ^4.1.2
@@ -55,6 +58,7 @@ dependencies:
   smooth_star_rating: ^1.1.1
   show_more_text_popup: ^0.2.0
   commons: ^0.7.8+3
+  delayed_display: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

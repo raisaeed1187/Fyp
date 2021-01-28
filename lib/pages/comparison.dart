@@ -69,45 +69,50 @@ class _ComparisonState extends State<Comparison> {
 
   void getScore() {
     for (int i = 0; i < this.compareList.length; i++) {
-      if (i == this.compareList.length - 1) {
-        break;
-      }
-      if (getCamera(i) > getCamera(i + 1)) {
-        setState(() {
-          mobilesScore[i] += 5;
-        });
-      } else {
-        setState(() {
-          mobilesScore[i + 1] += 5;
-        });
-      }
-      if (getStorage(i) > getStorage(i + 1)) {
-        setState(() {
-          mobilesScore[i] += 5;
-        });
-      } else {
-        setState(() {
-          mobilesScore[i + 1] += 5;
-        });
-      }
-      if (getRam(i) > getRam(i + 1)) {
-        setState(() {
-          mobilesScore[i] += 5;
-        });
-      } else {
-        setState(() {
-          mobilesScore[i + 1] += 5;
-        });
-      }
-      if (getBattery(i) > getBattery(i + 1)) {
-        setState(() {
-          mobilesScore[i] += 5;
-        });
-      } else {
-        setState(() {
-          mobilesScore[i + 1] += 5;
-        });
-      }
+      // if (i == this.compareList.length - 1) {
+      //   break;
+      // }
+      setState(() {
+        mobilesScore[i] = this.compareList[i].data['score'].round();
+        // mobilesScore.add(this.compareList[i].data['score'].round());
+      });
+
+      //   if (getCamera(i) > getCamera(i + 1)) {
+      //     setState(() {
+      //       mobilesScore[i] += 5;
+      //     });
+      //   } else {
+      //     setState(() {
+      //       mobilesScore[i + 1] += 5;
+      //     });
+      //   }
+      //   if (getStorage(i) > getStorage(i + 1)) {
+      //     setState(() {
+      //       mobilesScore[i] += 5;
+      //     });
+      //   } else {
+      //     setState(() {
+      //       mobilesScore[i + 1] += 5;
+      //     });
+      //   }
+      //   if (getRam(i) > getRam(i + 1)) {
+      //     setState(() {
+      //       mobilesScore[i] += 5;
+      //     });
+      //   } else {
+      //     setState(() {
+      //       mobilesScore[i + 1] += 5;
+      //     });
+      //   }
+      //   if (getBattery(i) > getBattery(i + 1)) {
+      //     setState(() {
+      //       mobilesScore[i] += 5;
+      //     });
+      //   } else {
+      //     setState(() {
+      //       mobilesScore[i + 1] += 5;
+      //     });
+      //   }
     }
   }
 
@@ -189,7 +194,7 @@ class _ComparisonState extends State<Comparison> {
   @override
   void initState() {
     super.initState();
-    // getScore();
+    getScore();
     sortMobile();
     addInPreviousList();
     // print("screen size: ${getScreenSize(0, 'display', 3)}");

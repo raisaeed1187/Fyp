@@ -19,13 +19,37 @@ class _PreviousCompresState extends State<PreviousCompres> {
     // final queryFavorites = Provider.of<QuerySnapshot>(context);
 
     return Material(
-      child: ListView(
-        children:
-            List.generate(AppData.previousComparisonsList.length, (index) {
-          return PreviousCompareCard(
-            mobilesCompare: AppData.previousComparisonsList[index],
-          );
-        }),
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Text(
+            'Previous Comparisons',
+            style: TextStyle(
+              fontSize: 18,
+//                        fontWeight: FontWeight.bold,
+              fontFamily: 'NeusaNextPro',
+              color: Colors.black,
+            ),
+          ),
+          titleSpacing: 0,
+          leading: IconButton(
+              icon:
+                  Icon(Icons.chevron_left, color: Color(0xFFFF6969), size: 30),
+              onPressed: () {
+                Navigator.of(context).pop();
+              }),
+          actions: <Widget>[],
+        ),
+        body: ListView(
+          children:
+              List.generate(AppData.previousComparisonsList.length, (index) {
+            return PreviousCompareCard(
+              mobilesCompare: AppData.previousComparisonsList[index],
+            );
+          }),
+        ),
       ),
     );
   }

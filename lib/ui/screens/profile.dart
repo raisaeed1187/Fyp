@@ -1,6 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutterfirebase/modal/data.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'dart:io';
+import 'dart:math';
+
+import 'package:permission_handler/permission_handler.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -63,12 +71,15 @@ class MapScreenState extends State<ProfilePage>
                             child: new Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                new CircleAvatar(
-                                  backgroundColor: Colors.red,
-                                  radius: 25.0,
-                                  child: new Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
+                                FlatButton(
+                                  onPressed: uploadImage,
+                                  child: new CircleAvatar(
+                                    backgroundColor: Colors.red,
+                                    radius: 25.0,
+                                    child: new Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 )
                               ],
@@ -377,5 +388,87 @@ class MapScreenState extends State<ProfilePage>
         });
       },
     );
+  }
+
+  Future getImage() async {
+    // Get image from gallery.
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    _uploadImageToFirebase(image);
+  }
+
+  Future<void> _uploadImageToFirebase(File image) async {
+    try {
+      // Make random image name.
+      int randomNumber = Random().nextInt(100000);
+      String imageLocation = 'images/image${randomNumber}.jpg';
+
+      // Upload image to firebase.
+      final StorageReference storageReference =
+          FirebaseStorage().ref().child(imageLocation);
+      final StorageUploadTask uploadTask = storageReference.putFile(image);
+      await uploadTask.onComplete;
+      _addPathToDatabase(imageLocation);
+    } catch (e) {
+      print(e.message);
+    }
+  }
+
+  Future<void> _addPathToDatabase(String text) async {
+    try {
+      // Get image URL from firebase
+      final ref = FirebaseStorage().ref().child(text);
+      var imageString = await ref.getDownloadURL();
+
+      // Add location and url to database
+      await Firestore.instance
+          .collection('storage')
+          .document()
+          .setData({'url': imageString, 'location': text});
+    } catch (e) {
+      print(e.message);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(e.message),
+            );
+          });
+    }
+  } //end add path
+
+  uploadImage() async {
+    final _storage = FirebaseStorage.instance;
+    final _picker = ImagePicker();
+    PickedFile image;
+
+    //Check Permissions
+    await Permission.photos.request();
+
+    var permissionStatus = await Permission.photos.status;
+
+    if (permissionStatus.isGranted) {
+      //Select Image
+      image = await _picker.getImage(source: ImageSource.gallery);
+      var file = File(image.path);
+
+      if (image != null) {
+        //Upload to Firebase
+        var snapshot = await _storage
+            .ref()
+            .child('folderName/imageName')
+            .putFile(file)
+            .onComplete;
+
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+        print(downloadUrl);
+        // setState(() {
+        //   imageUrl = downloadUrl;
+        // });
+      } else {
+        print('No Path Received');
+      }
+    } else {
+      print('Grant Permissions and try again');
+    }
   }
 }

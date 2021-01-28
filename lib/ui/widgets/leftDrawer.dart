@@ -216,7 +216,7 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                     color: blackColor)),
             onTap: () {
               // Nav.route(context, Checkout());
-              DatabaseService().giveScore();
+              // DatabaseService().giveScore();
             },
           ),
 

@@ -45,6 +45,7 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
 
   @override
   Widget build(BuildContext context) {
+    print("list length in advatage ${this.compareList.length}");
     return Column(
       children: [
         Card(
@@ -225,19 +226,15 @@ class _CompareAdvantagesState extends State<CompareAdvantages> {
               //   ),
               //  // ),
               Column(
-                  children: List.generate(compareList.length, (index) {
-                // if (index != compareList.length - 1) {
-                return ReasonWidget(
-                  getFunction: dispalyWidget,
-                  compareList: compareList,
-                  mobilesScore: mobilesScore,
-                  toggleVariable: display,
-                  index: index,
-                );
-                // } else {
-                //   return Text('');
-                // }
-              })),
+                children: List.generate(this.compareList.length, (index) {
+                  return ReasonWidget(
+                    getFunction: dispalyWidget,
+                    compareList: compareList,
+                    toggleVariable: display,
+                    index: index,
+                  );
+                }),
+              ),
 
               // ReasonWidget(
               //   getFunction: designWidget,
@@ -329,14 +326,12 @@ class comparisonWidget extends StatelessWidget {
 class ReasonWidget extends StatefulWidget {
   Function getFunction;
   List<DocumentSnapshot> compareList;
-  List<int> mobilesScore;
   bool toggleVariable;
   int index;
   int secondIndex;
   ReasonWidget(
       {this.getFunction,
       this.compareList,
-      this.mobilesScore,
       this.toggleVariable,
       this.index,
       this.secondIndex});
@@ -356,7 +351,7 @@ class _ReasonWidgetState extends State<ReasonWidget> {
   }
 
   int getCamera(int index) {
-    return getNumber(index, 'primary_camera', 2);
+    return getNumber(index, 'primary_camera', 3);
   }
 
   int getRam(int index) {
@@ -364,7 +359,7 @@ class _ReasonWidgetState extends State<ReasonWidget> {
   }
 
   int getStorage(int index) {
-    return getNumber(index, 'storage', 3);
+    return getNumber(index, 'storage', 2);
   }
 
   int getBattery(int index) {
@@ -381,10 +376,14 @@ class _ReasonWidgetState extends State<ReasonWidget> {
 
   void getMobInfo() {
     for (int i = 0; i < widget.compareList.length; i++) {
-      mobsRam.add(getRam(i));
-      mobsCamera.add(getCamera(i));
-      mobsStorage.add(getStorage(i));
-      mobsBattery.add(getBattery(i));
+      // mobsRam.add(getRam(i));
+      // mobsCamera.add(getCamera(i));
+      // mobsStorage.add(getStorage(i));
+      // mobsBattery.add(getBattery(i));
+      mobsBattery.add(widget.compareList[i].data['battery_size'].round());
+      mobsCamera.add(widget.compareList[i].data['primary_camera_size'].round());
+      mobsStorage.add(widget.compareList[i].data['storage_size'].round());
+      mobsRam.add(widget.compareList[i].data['ram_size'].round());
     }
     for (int i = 0; i < widget.compareList.length; i++) {
       for (int j = i + 1; j < widget.compareList.length; j++) {
@@ -411,11 +410,11 @@ class _ReasonWidgetState extends State<ReasonWidget> {
       }
     }
     // print(mobsRam[0]);
-    for (int i = 0; i < widget.compareList.length; i++) {
-      if (getRam(i) == mobsRam[0]) {
-        print('more ram ${getRam(i)}');
-      }
-    }
+    // for (int i = 0; i < widget.compareList.length; i++) {
+    //   if (getRam(i) == mobsRam[0]) {
+    //     print('more ram ${getRam(i)}');
+    //   }
+    // }
   }
 
   @override
@@ -511,46 +510,468 @@ class _ReasonWidgetState extends State<ReasonWidget> {
                 //         feature: 'ram',
                 //       )
                 //     : Text(''),
-                getRam(widget.index) == mobsRam[0]
-                    ? comparisonWidget(
-                        title: 'More RAM',
-                        compareList: widget.compareList,
-                        feature: 'ram',
+                widget.compareList.length == 2
+                    ? Column(
+                        children: <Widget>[
+                          //compalist length 2
+                          widget.compareList[widget.index].data['ram_size']
+                                      .round() ==
+                                  mobsRam[0]
+                              ? widget.compareList[0].data['ram_size'].round() >
+                                      widget.compareList[1].data['ram_size']
+                                          .round()
+                                  ? comparisonWidget(
+                                      title: 'More RAM',
+                                      compareList: widget.compareList,
+                                      feature: 'ram',
+                                    )
+                                  : widget.compareList[1].data['ram_size']
+                                              .round() >
+                                          widget.compareList[0].data['ram_size']
+                                              .round()
+                                      ? comparisonWidget(
+                                          title: 'More RAM',
+                                          compareList: widget.compareList,
+                                          feature: 'ram',
+                                        )
+                                      : Text('')
+                              : Text(''),
+
+                          widget.compareList[widget.index]
+                                      .data['primary_camera_size']
+                                      .round() ==
+                                  mobsCamera[0]
+                              ? widget.compareList[0]
+                                          .data['primary_camera_size']
+                                          .round() >
+                                      widget.compareList[1]
+                                          .data['primary_camera_size']
+                                          .round()
+                                  ? comparisonWidget(
+                                      title: 'Better Camera',
+                                      compareList: widget.compareList,
+                                      feature: 'primary_camera',
+                                    )
+                                  : widget.compareList[1]
+                                              .data['primary_camera_size']
+                                              .round() >
+                                          widget.compareList[0]
+                                              .data['primary_camera_size']
+                                              .round()
+                                      ? comparisonWidget(
+                                          title: 'Better Camera',
+                                          compareList: widget.compareList,
+                                          feature: 'primary_camera',
+                                        )
+                                      : Text('')
+                              : Text(''),
+                          widget.compareList[widget.index].data['storage_size']
+                                      .round() ==
+                                  mobsStorage[0]
+                              ? widget.compareList[0].data['storage_size']
+                                          .round() >
+                                      widget.compareList[1].data['storage_size']
+                                          .round()
+                                  ? comparisonWidget(
+                                      title: 'Storage',
+                                      compareList: widget.compareList,
+                                      feature: 'storage',
+                                    )
+                                  : widget.compareList[1].data['storage_size']
+                                              .round() >
+                                          widget.compareList[0]
+                                              .data['storage_size']
+                                              .round()
+                                      ? comparisonWidget(
+                                          title: 'Storage',
+                                          compareList: widget.compareList,
+                                          feature: 'storage',
+                                        )
+                                      : Text('')
+                              : Text(''),
+                          getBattery(widget.index) == mobsBattery[0]
+                              ? getBattery(0) > getBattery(1)
+                                  ? comparisonWidget(
+                                      title: 'Bigger Battery',
+                                      compareList: widget.compareList,
+                                      feature: 'battery',
+                                    )
+                                  : getBattery(1) > getBattery(0)
+                                      ? comparisonWidget(
+                                          title: 'Bigger Battery',
+                                          compareList: widget.compareList,
+                                          feature: 'battery',
+                                        )
+                                      : Text('')
+                              : Text(''),
+                        ],
                       )
-                    : Text(''),
-                // comparisonWidget(
-                //   title: 'More RAM',
-                //   compareList: compareList,
-                //   feature: 'ram',
-                // ),
-                // comparisonWidget(
-                //   title: 'Better Camera',
-                //   compareList: compareList,
-                //   feature: 'primary_camera',
-                // )
-                getCamera(widget.index) == mobsCamera[0]
-                    ? comparisonWidget(
-                        title: 'Better Camera',
-                        compareList: widget.compareList,
-                        feature: 'primary_camera',
-                      )
-                    : Text(''),
-                getStorage(widget.index) == mobsStorage[0]
-                    ? comparisonWidget(
-                        title: 'Storage',
-                        compareList: widget.compareList,
-                        feature: 'storage',
-                      )
-                    : Text(''),
-                getBattery(widget.index) == mobsBattery[0]
-                    ? comparisonWidget(
-                        title: 'Bigger Battery',
-                        compareList: widget.compareList,
-                        feature: 'battery',
-                      )
-                    : Text(''),
+                    : widget.compareList.length == 3
+                        ? Column(
+                            children: <Widget>[
+                              //compalist length 3
+                              widget.compareList[widget.index].data['ram_size'].round() ==
+                                      mobsRam[0]
+                                  ? (widget.compareList[0].data['ram_size'].round() >
+                                              widget.compareList[1].data['ram_size']
+                                                  .round()) &&
+                                          (widget.compareList[0].data['ram_size'].round() >
+                                              widget.compareList[2].data['ram_size']
+                                                  .round()) //check 0 index
+                                      ? comparisonWidget(
+                                          title: 'More RAM',
+                                          compareList: widget.compareList,
+                                          feature: 'ram',
+                                        )
+                                      : (widget.compareList[1].data['ram_size'].round() >
+                                                  widget.compareList[0].data['ram_size']
+                                                      .round()) &&
+                                              (widget.compareList[1].data['ram_size'].round() >
+                                                  widget.compareList[2].data['ram_size']
+                                                      .round()) //check 1 index
+                                          ? comparisonWidget(
+                                              title: 'More RAM',
+                                              compareList: widget.compareList,
+                                              feature: 'ram',
+                                            )
+                                          : (widget.compareList[2].data['ram_size'].round() > widget.compareList[0].data['ram_size'].round()) &&
+                                                  (widget.compareList[2].data['ram_size'].round() >
+                                                      widget.compareList[1]
+                                                          .data['ram_size']
+                                                          .round()) //check 2 index
+                                              ? comparisonWidget(
+                                                  title: 'More RAM',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'ram',
+                                                )
+                                              : Text('')
+                                  : Text(''),
+
+                              widget.compareList[widget.index].data['primary_camera_size'].round() ==
+                                      mobsCamera[0]
+                                  ? (widget.compareList[0].data['primary_camera_size'].round() >
+                                              widget.compareList[1].data['primary_camera_size']
+                                                  .round()) &&
+                                          (widget.compareList[0].data['primary_camera_size'].round() >
+                                              widget.compareList[2].data['primary_camera_size']
+                                                  .round()) //check 0 index
+                                      ? comparisonWidget(
+                                          title: 'Better Camera',
+                                          compareList: widget.compareList,
+                                          feature: 'primary_camera',
+                                        )
+                                      : (widget.compareList[1].data['primary_camera_size'].round() >
+                                                  widget.compareList[0].data['primary_camera_size']
+                                                      .round()) &&
+                                              (widget.compareList[1].data['primary_camera_size'].round() >
+                                                  widget.compareList[2].data['primary_camera_size']
+                                                      .round()) //check 1 index
+                                          ? comparisonWidget(
+                                              title: 'Better Camera',
+                                              compareList: widget.compareList,
+                                              feature: 'primary_camera',
+                                            )
+                                          : (widget.compareList[2].data['primary_camera_size'].round() > widget.compareList[0].data['primary_camera_size'].round()) &&
+                                                  (widget.compareList[2].data['primary_camera_size'].round() >
+                                                      widget.compareList[1]
+                                                          .data['primary_camera_size']
+                                                          .round()) //check 2 index
+                                              ? comparisonWidget(
+                                                  title: 'Better Camera',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'primary_camera',
+                                                )
+                                              : Text('')
+                                  : Text(''),
+                              widget.compareList[widget.index].data['storage_size'].round() ==
+                                      mobsStorage[0]
+                                  ? (widget.compareList[0].data['storage_size'].round() >
+                                              widget.compareList[1].data['storage_size']
+                                                  .round()) &&
+                                          (widget.compareList[0].data['storage_size'].round() >
+                                              widget.compareList[2].data['storage_size']
+                                                  .round()) //check 0 index
+                                      ? comparisonWidget(
+                                          title: 'Storage',
+                                          compareList: widget.compareList,
+                                          feature: 'storage',
+                                        )
+                                      : (widget.compareList[1].data['storage_size'].round() > widget.compareList[0].data['storage_size'].round()) &&
+                                              (widget.compareList[1].data['storage_size'].round() >
+                                                  widget.compareList[2]
+                                                      .data['storage_size']
+                                                      .round()) //check 1 index
+                                          ? comparisonWidget(
+                                              title: 'Storage',
+                                              compareList: widget.compareList,
+                                              feature: 'storage',
+                                            )
+                                          : (widget.compareList[2].data['storage_size'].round() >
+                                                      widget.compareList[0]
+                                                          .data['storage_size']
+                                                          .round()) &&
+                                                  (widget.compareList[2].data['storage_size'].round() >
+                                                      widget.compareList[1].data['storage_size'].round()) //check 2 index
+                                              ? comparisonWidget(
+                                                  title: 'Storage',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'storage',
+                                                )
+                                              : Text('')
+                                  : Text(''),
+                              getBattery(widget.index) == mobsBattery[0]
+                                  ? (getBattery(0) > getBattery(1)) &&
+                                          (getBattery(0) >
+                                              getBattery(2)) //check 0 index
+                                      ? comparisonWidget(
+                                          title: 'Bigger Battery',
+                                          compareList: widget.compareList,
+                                          feature: 'battery',
+                                        )
+                                      : (getBattery(1) > getBattery(0)) &&
+                                              (getBattery(1) >
+                                                  getBattery(2)) //check 1 index
+                                          ? comparisonWidget(
+                                              title: 'Bigger Battery',
+                                              compareList: widget.compareList,
+                                              feature: 'battery',
+                                            )
+                                          : (getBattery(2) > getBattery(0)) &&
+                                                  (getBattery(2) >
+                                                      getBattery(
+                                                          1)) //check 2 index
+                                              ? comparisonWidget(
+                                                  title: 'Bigger Battery',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'battery',
+                                                )
+                                              : Text('')
+                                  : Text(''),
+                            ],
+                          )
+                        : widget.compareList.length == 4
+                            ? Column(
+                                children: <Widget>[
+                                  //compalist length 4
+                                  widget.compareList[widget.index].data['ram_size'].round() ==
+                                          mobsRam[0]
+                                      ? (widget.compareList[0].data['ram_size'].round() > widget.compareList[1].data['ram_size'].round()) &&
+                                              (widget.compareList[0].data['ram_size'].round() >
+                                                  widget.compareList[2].data['ram_size']
+                                                      .round()) &&
+                                              (widget.compareList[0].data['ram_size'].round() >
+                                                  widget.compareList[3].data['ram_size']
+                                                      .round()) //check 0 index
+                                          ? comparisonWidget(
+                                              title: 'More RAM',
+                                              compareList: widget.compareList,
+                                              feature: 'ram',
+                                            )
+                                          : (widget.compareList[1].data['ram_size'].round() > widget.compareList[0].data['ram_size'].round()) &&
+                                                  (widget.compareList[1].data['ram_size'].round() >
+                                                      widget.compareList[2].data['ram_size']
+                                                          .round()) &&
+                                                  (widget.compareList[1].data['ram_size'].round() >
+                                                      widget.compareList[3]
+                                                          .data['ram_size']
+                                                          .round()) //check 1 index
+                                              ? comparisonWidget(
+                                                  title: 'More RAM',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'ram',
+                                                )
+                                              : (widget.compareList[2].data['ram_size'].round() > widget.compareList[0].data['ram_size'].round()) &&
+                                                      (widget.compareList[2].data['ram_size'].round() >
+                                                          widget.compareList[1]
+                                                              .data['ram_size']
+                                                              .round()) &&
+                                                      (widget.compareList[2].data['ram_size'].round() > widget.compareList[3].data['ram_size'].round()) //check 2 index
+                                                  ? comparisonWidget(
+                                                      title: 'More RAM',
+                                                      compareList:
+                                                          widget.compareList,
+                                                      feature: 'ram',
+                                                    )
+                                                  : (widget.compareList[3].data['ram_size'].round() > widget.compareList[0].data['ram_size'].round()) && (widget.compareList[3].data['ram_size'].round() > widget.compareList[1].data['ram_size'].round()) && (widget.compareList[3].data['ram_size'].round() > widget.compareList[2].data['ram_size'].round()) //check 3 index
+                                                      ? comparisonWidget(
+                                                          title: 'More RAM',
+                                                          compareList: widget
+                                                              .compareList,
+                                                          feature: 'ram',
+                                                        )
+                                                      : Text('')
+                                      : Text(''),
+
+                                  widget.compareList[widget.index].data['primary_camera_size'].round() ==
+                                          mobsCamera[0]
+                                      ? (widget.compareList[0].data['primary_camera_size'].round() > widget.compareList[1].data['primary_camera_size'].round()) &&
+                                              (widget.compareList[0].data['primary_camera_size'].round() >
+                                                  widget.compareList[2].data['primary_camera_size']
+                                                      .round()) &&
+                                              (widget.compareList[0].data['primary_camera_size'].round() >
+                                                  widget.compareList[3].data['primary_camera_size']
+                                                      .round()) //check 0 index
+                                          ? comparisonWidget(
+                                              title: 'Better Camera',
+                                              compareList: widget.compareList,
+                                              feature: 'primary_camera',
+                                            )
+                                          : (widget.compareList[1].data['primary_camera_size'].round() > widget.compareList[0].data['primary_camera_size'].round()) &&
+                                                  (widget.compareList[1].data['primary_camera_size'].round() >
+                                                      widget.compareList[2].data['primary_camera_size']
+                                                          .round()) &&
+                                                  (widget.compareList[1].data['primary_camera_size'].round() >
+                                                      widget.compareList[3].data['primary_camera_size']
+                                                          .round()) //check 1 index
+                                              ? comparisonWidget(
+                                                  title: 'Better Camera',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'primary_camera',
+                                                )
+                                              : (widget.compareList[2].data['primary_camera_size'].round() > widget.compareList[0].data['primary_camera_size'].round()) &&
+                                                      (widget.compareList[2].data['primary_camera_size'].round() >
+                                                          widget.compareList[1].data['primary_camera_size']
+                                                              .round()) &&
+                                                      (widget.compareList[2].data['primary_camera_size'].round() >
+                                                          widget.compareList[3].data['primary_camera_size']
+                                                              .round()) //check 2 index
+                                                  ? comparisonWidget(
+                                                      title: 'Better Camera',
+                                                      compareList:
+                                                          widget.compareList,
+                                                      feature: 'primary_camera',
+                                                    )
+                                                  : (widget.compareList[3].data['primary_camera_size'].round() > widget.compareList[0].data['primary_camera_size'].round()) &&
+                                                          (widget.compareList[3].data['primary_camera_size'].round() >
+                                                              widget.compareList[1].data['primary_camera_size']
+                                                                  .round()) &&
+                                                          (widget.compareList[3].data['primary_camera_size'].round() >
+                                                              widget
+                                                                  .compareList[2]
+                                                                  .data['primary_camera_size']
+                                                                  .round()) //check 3 index
+                                                      ? comparisonWidget(
+                                                          title:
+                                                              'Better Camera',
+                                                          compareList: widget
+                                                              .compareList,
+                                                          feature:
+                                                              'primary_camera',
+                                                        )
+                                                      : Text('')
+                                      : Text(''),
+                                  widget.compareList[widget.index].data['storage_size'].round() ==
+                                          mobsStorage[0]
+                                      ? (widget.compareList[0].data['storage_size'].round() > widget.compareList[1].data['storage_size'].round()) &&
+                                              (widget.compareList[0].data['storage_size'].round() >
+                                                  widget.compareList[2].data['storage_size']
+                                                      .round()) &&
+                                              (widget.compareList[0].data['storage_size'].round() >
+                                                  widget.compareList[3].data['storage_size']
+                                                      .round()) //check 0 index
+                                          ? comparisonWidget(
+                                              title: 'Storage',
+                                              compareList: widget.compareList,
+                                              feature: 'storage',
+                                            )
+                                          : (widget.compareList[1].data['storage_size'].round() >
+                                                      widget.compareList[0]
+                                                          .data['storage_size']
+                                                          .round()) &&
+                                                  (widget.compareList[1].data['storage_size'].round() >
+                                                      widget.compareList[2]
+                                                          .data['storage_size']
+                                                          .round()) &&
+                                                  (widget.compareList[1].data['storage_size'].round() >
+                                                      widget.compareList[3]
+                                                          .data['storage_size']
+                                                          .round()) //check 1 index
+                                              ? comparisonWidget(
+                                                  title: 'Storage',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'storage',
+                                                )
+                                              : (widget.compareList[2].data['storage_size'].round() > widget.compareList[0].data['storage_size'].round()) &&
+                                                      (widget.compareList[2].data['storage_size'].round() > widget.compareList[1].data['storage_size'].round()) &&
+                                                      (widget.compareList[2].data['storage_size'].round() > widget.compareList[3].data['storage_size'].round()) //check 2 index
+                                                  ? comparisonWidget(
+                                                      title: 'Storage',
+                                                      compareList:
+                                                          widget.compareList,
+                                                      feature: 'storage',
+                                                    )
+                                                  : (widget.compareList[3].data['storage_size'].round() > widget.compareList[0].data['storage_size'].round()) && (widget.compareList[3].data['storage_size'].round() > widget.compareList[1].data['storage_size'].round()) && (widget.compareList[3].data['storage_size'].round() > widget.compareList[2].data['storage_size'].round()) //check 3 index
+                                                      ? comparisonWidget(
+                                                          title: 'Storage',
+                                                          compareList: widget
+                                                              .compareList,
+                                                          feature: 'storage',
+                                                        )
+                                                      : Text('')
+                                      : Text(''),
+                                  getBattery(widget.index) == mobsBattery[0]
+                                      ? (getBattery(0) > getBattery(1)) &&
+                                              (getBattery(0) > getBattery(2)) &&
+                                              (getBattery(0) >
+                                                  getBattery(3)) //check 0 index
+                                          ? comparisonWidget(
+                                              title: 'Bigger Battery',
+                                              compareList: widget.compareList,
+                                              feature: 'battery',
+                                            )
+                                          : (getBattery(1) > getBattery(0)) &&
+                                                  (getBattery(1) >
+                                                      getBattery(2)) &&
+                                                  (getBattery(1) >
+                                                      getBattery(
+                                                          3)) //check 1 index
+                                              ? comparisonWidget(
+                                                  title: 'Bigger Battery',
+                                                  compareList:
+                                                      widget.compareList,
+                                                  feature: 'battery',
+                                                )
+                                              : (getBattery(2) >
+                                                          getBattery(0)) &&
+                                                      (getBattery(2) >
+                                                          getBattery(1)) &&
+                                                      (getBattery(2) >
+                                                          getBattery(
+                                                              3)) //check 2 index
+                                                  ? comparisonWidget(
+                                                      title: 'Bigger Battery',
+                                                      compareList:
+                                                          widget.compareList,
+                                                      feature: 'battery',
+                                                    )
+                                                  : (getBattery(3) >
+                                                              getBattery(0)) &&
+                                                          (getBattery(3) >
+                                                              getBattery(1)) &&
+                                                          (getBattery(3) >
+                                                              getBattery(
+                                                                  2)) //check 3 index
+                                                      ? comparisonWidget(
+                                                          title:
+                                                              'Bigger Battery',
+                                                          compareList: widget
+                                                              .compareList,
+                                                          feature: 'battery',
+                                                        )
+                                                      : Text('')
+                                      : Text(''),
+                                ],
+                              )
+                            : Text(''), //end comparelist length 4
               ],
-            ),
+            ), //outer column
           ),
         ],
       ),

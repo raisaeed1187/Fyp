@@ -42,6 +42,7 @@ import 'products_list.dart';
 import 'usersettings.dart';
 // import 'dart:async';
 import 'package:flutterfirebase/ui/screens/favorite_compares.dart';
+import 'package:delayed_display/delayed_display.dart';
 
 class Home extends StatefulWidget {
   final String uid;
@@ -70,7 +71,7 @@ class _HomeState extends State<Home> {
 
     fetchData();
     // print('favorite in home:${AppData.favoriteMobiles.length}');
-    DatabaseService().giveScore();
+    // DatabaseService().giveScore();
     super.initState();
   }
 
@@ -81,10 +82,10 @@ class _HomeState extends State<Home> {
     // final userData = Provider.of<UserData>(context);
     // print('total mobiles: ${AppData.mobilesList.length}');
     print('previous list: ${AppData.previousComparisonsList.length}');
-    // if (AppData.compareList.length == 0) {
-    //   final comparisonProvider = context.watch<ComparisonProvider>();
-    //   comparisonProvider.clearCompareList();
-    // }
+    if (AppData.compareList.length == 0) {
+      final comparisonProvider = context.watch<ComparisonProvider>();
+      comparisonProvider.clearCompareList();
+    }
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
       child: DefaultTabController(
@@ -123,123 +124,129 @@ class _HomeState extends State<Home> {
           ),
           body: TabBarView(
             children: [
-              Container(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      CategoriesListView(
-                        title: "YOUR TITLES",
-                        categories: [
-                          'menu.png',
-                          'iphone_logo-2.png',
-                          'samsung_logo.jpg',
-                          'oppo_logo-2.png',
-                          'telephone.png',
-                          'telephone.png',
-                          'telephone.png',
-                          'telephone.png',
-                          'telephone.png',
-                          'telephone.png'
-                        ],
-                        categoryTitle: [
-                          'All',
-                          'Apple',
-                          'Samsung',
-                          'Oppo',
-                          'Infinix',
-                          'Realme',
-                          'Tecno',
-                          'Vivo',
-                          'Huawei',
-                          'Xiaomi'
-                        ],
-                      ),
-                      StreamProvider<QuerySnapshot>.value(
-                          value: banners, child: buildCarouselSlider()),
-                      SizedBox(
-                        height: 5.0,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "Latest",
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => ProductList(
-                                            mobilesList: AppData.mobilesList,
-                                          )));
-                                  // Navigator.push(
-                                  //   context,
-                                  //   PageTransition(
-                                  //     type: PageTransitionType.fade,
-                                  //     child: ProductList(
-                                  //       mobilesList: AppData.mobilesList,
-                                  //     ),
-                                  //   ),
-                                  // );
-                                },
-                                child: Text(
-                                  "View All",
-                                  style: TextStyle(
-                                      fontSize: 18.0, color: Colors.blue),
-                                  textAlign: TextAlign.end,
-                                ),
-                              ),
-                            ),
+              DelayedDisplay(
+                delay: Duration(seconds: 1),
+                child: Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        CategoriesListView(
+                          title: "YOUR TITLES",
+                          categories: [
+                            'menu.png',
+                            'iphone_logo-2.png',
+                            'samsung_logo.jpg',
+                            'oppo_logo-2.png',
+                            'telephone.png',
+                            'telephone.png',
+                            'telephone.png',
+                            'telephone.png',
+                            'telephone.png',
+                            'telephone.png'
+                          ],
+                          categoryTitle: [
+                            'All',
+                            'Apple',
+                            'Samsung',
+                            'Oppo',
+                            'Infinix',
+                            'Realme',
+                            'Tecno',
+                            'Vivo',
+                            'Huawei',
+                            'Xiaomi'
                           ],
                         ),
-                      ),
-                      buildLatest(),
-                      Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                "Best Selling",
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () {
-                                  print("Clicked");
-                                },
+                        StreamProvider<QuerySnapshot>.value(
+                            value: banners, child: buildCarouselSlider()),
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
                                 child: Text(
-                                  "View All",
+                                  "Latest",
                                   style: TextStyle(
-                                      fontSize: 18.0, color: Colors.blue),
-                                  textAlign: TextAlign.end,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.start,
                                 ),
                               ),
-                            ),
-                          ],
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => ProductList(
+                                                  mobilesList:
+                                                      AppData.mobilesList,
+                                                )));
+                                    // Navigator.push(
+                                    //   context,
+                                    //   PageTransition(
+                                    //     type: PageTransitionType.fade,
+                                    //     child: ProductList(
+                                    //       mobilesList: AppData.mobilesList,
+                                    //     ),
+                                    //   ),
+                                    // );
+                                  },
+                                  child: Text(
+                                    "View All",
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.blue),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      buildTrending(),
-                      // CompareMobile(),
-                      // Occasions(),
-                    ],
+                        buildLatest(),
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  "Best Selling",
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    print("Clicked");
+                                  },
+                                  child: Text(
+                                    "View All",
+                                    style: TextStyle(
+                                        fontSize: 18.0, color: Colors.blue),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        buildTrending(),
+                        // CompareMobile(),
+                        // Occasions(),
+                      ],
+                    ),
                   ),
                 ),
               ),
               PageSearch(),
-              FavoriteComparesList(),
-              ProfilePage(),
+              DelayedDisplay(
+                  delay: Duration(seconds: 1), child: FavoriteComparesList()),
+              DelayedDisplay(delay: Duration(seconds: 1), child: ProfilePage()),
             ],
           ),
         ),
