@@ -18,7 +18,10 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 class ProductDetails extends StatefulWidget {
   DocumentSnapshot mobile;
-  ProductDetails({this.mobile});
+
+  ProductDetails({
+    this.mobile,
+  });
   @override
   _ProductDetailsState createState() => _ProductDetailsState(mobile);
 }
@@ -568,18 +571,22 @@ class _ProductDetailsState extends State<ProductDetails> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Text(
-                                mobile['product_name'],
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Text(
+                                  "${mobile['product_name']}'s",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              Text(
-                                ' SPECIFICATIONS',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Text(
+                                  ' SPECIFICATIONS',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
@@ -660,32 +667,33 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           CrossAxisAlignment.start,
 //                          mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
+                                        // advantageWidget(
+                                        //   type: 'Has Responsive Touch Screen',
+                                        //   value: 'Capacitive, MultiTouch',
+                                        // ),
+                                        // advantageWidget(
+                                        //   type: 'Quite Big Screen',
+                                        //   value: '6.53 in',
+                                        // ),
+                                        // advantageWidget(
+                                        //   type: 'Sharp Screen',
+                                        //   value: '~395 PPI',
+                                        // ),
                                         advantageWidget(
-                                          type: 'Has Responsive Touch Screen',
-                                          value: 'Capacitive, MultiTouch',
-                                        ),
-                                        advantageWidget(
-                                          type: 'Quite Big Screen',
-                                          value: '6.53 in',
-                                        ),
-                                        advantageWidget(
-                                          type: 'Sharp Screen',
-                                          value: '~395 PPI',
-                                        ),
-                                        advantageWidget(
-                                          type: 'Octa Core CPU',
+                                          type: 'Chipset',
+                                          value: mobile['chipset'],
                                         ),
                                         advantageWidget(
                                           type: 'Lots of Storage Capacity',
-                                          value: '64 GB',
+                                          value: mobile['storage'],
                                         ),
                                         advantageWidget(
                                           type: 'Faster CPU',
-                                          value: '2 GHz',
+                                          value: mobile['cpu'],
                                         ),
                                         advantageWidget(
                                           type: 'Lots Of RAM',
-                                          value: '4 GB',
+                                          value: mobile['ram'],
                                         ),
                                       ],
                                     ),
@@ -765,7 +773,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                                       children: [
                                         advantageWidget(
                                           type: 'Heavy Weight',
-                                          value: '198 g',
+                                          value: mobile['weight'],
                                         ),
                                       ],
                                     ),
@@ -1292,12 +1300,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                                     ),
                                     child: Column(
                                       children: [
-                                        buildSigleDetail(
-                                            'Type', mobile['battery']),
-                                        Divider(
-                                          height: 10.0,
-                                          color: Colors.black,
-                                        ),
+                                        // buildSigleDetail(
+                                        //     'Type', mobile['battery']),
+                                        // Divider(
+                                        //   height: 10.0,
+                                        //   color: Colors.black,
+                                        // ),
                                         buildSigleDetail(
                                             'Size', mobile['battery']),
                                         Divider(
@@ -1425,7 +1433,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                 BuildComments(
                   mobName: mobile['product_name'],
                 ),
-                _buildProducts(context),
+                _buildProducts(context, mobile),
               ],
             ),
           ),
@@ -1471,11 +1479,11 @@ class advantageWidget extends StatelessWidget {
       children: [
         Text(
           type,
-          style: TextStyle(fontSize: 18.0),
+          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
         ),
         Text(
           value,
-          style: TextStyle(fontSize: 18.0),
+          style: TextStyle(fontSize: 16.0),
         ),
         Divider(
           height: 10.0,
@@ -1630,220 +1638,301 @@ class _BuildCommentsState extends State<BuildComments> {
                       DocumentSnapshot comment = snapshot.data.documents[index];
                       // checkReply.add(false);
 
-                      return Container(
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(
-                              child: Divider(
-                                color: Colors.black26,
-                                height: 4,
-                              ),
-                              // height: 24,
-                            ),
-                            ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
-                              ),
-                              subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    StarRating(
-                                        rating: comment['rating'], size: 15),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Color(0xFFE9F1FE),
-                                        borderRadius:
-                                            BorderRadius.circular(6.0),
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Text(comment['comment']),
-                                      ),
+                      return StreamBuilder<Object>(
+                          stream: Firestore.instance
+                              .collection('Users')
+                              .document(comment['user_id'])
+                              .snapshots(),
+                          builder: (context, userSnapshot) {
+                            if (!userSnapshot.hasData) {
+                              return Text('no data');
+                            }
+                            DocumentSnapshot userInfo = userSnapshot.data;
+                            return Container(
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    child: Divider(
+                                      color: Colors.black26,
+                                      height: 4,
                                     ),
-                                    Row(
+                                    // height: 24,
+                                  ),
+                                  ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundImage: userInfo['img'].isEmpty
+                                          ? NetworkImage(
+                                              "https://ui-avatars.com/api/?color=ff0000&name=${userInfo['name']}")
+                                          : NetworkImage(userInfo['img']),
+                                      // backgroundImage: NetworkImage(
+                                      //     "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                                    ),
+                                    subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          StarRating(
+                                              rating: comment['rating'],
+                                              size: 15),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Color(0xFFE9F1FE),
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0),
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(8),
+                                              child: Text(comment['comment']),
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: <Widget>[
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    checkReply[index] =
+                                                        !checkReply[index];
+                                                  });
+                                                  print(
+                                                      "check reply $index: ${checkReply[index]}");
+                                                },
+                                                child: Text(
+                                                  'Reply',
+                                                  style:
+                                                      TextStyle(fontSize: 14),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          checkReply[index]
+                                              ? Container(
+                                                  width: double.infinity,
+                                                  child:
+                                                      Column(children: <Widget>[
+                                                    TextField(
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText:
+                                                            'Enter your reply',
+                                                      ),
+                                                      controller:
+                                                          replyController,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          reply = value;
+                                                        });
+                                                      },
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Container(
+                                                      color: Color(0xFFFB7C7A),
+                                                      width: 120,
+                                                      height: 30,
+                                                      child: FlatButton(
+                                                        onPressed: () {
+                                                          var now =
+                                                              DateTime.now();
+                                                          print(now);
+                                                          CollectionReference
+                                                              collectionReference =
+                                                              Firestore.instance
+                                                                  .collection(
+                                                                      'comments')
+                                                                  .document(comment
+                                                                      .documentID)
+                                                                  .collection(
+                                                                      'Replies');
+                                                          collectionReference.add({
+                                                            'user_id': AppData
+                                                                .activeUserId,
+                                                            'user_name': AppData
+                                                                .activeUserName,
+                                                            'user_image': 'img',
+                                                            'comment_id':
+                                                                comment
+                                                                    .documentID,
+                                                            'comment': reply,
+                                                            'date_time': now,
+                                                          }).then((value) =>
+                                                              print(value
+                                                                  .documentID));
+                                                          replyController
+                                                              .clear();
+                                                        },
+                                                        child: Text(
+                                                          'Send Reply',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ]),
+                                                )
+                                              : Text(''),
+                                          StreamBuilder(
+                                            stream: Firestore.instance
+                                                .collection('comments')
+                                                .document(comment.documentID)
+                                                .collection('Replies')
+                                                .orderBy('date_time')
+                                                .snapshots(),
+                                            builder: (context, snapshot2) {
+                                              if (!snapshot2.hasData) {
+                                                return Text('no data');
+                                              }
+                                              return ListView.builder(
+                                                  itemCount: snapshot2
+                                                      .data.documents.length,
+                                                  scrollDirection:
+                                                      Axis.vertical,
+                                                  shrinkWrap: true,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    DocumentSnapshot replyData =
+                                                        snapshot2.data
+                                                            .documents[index];
+
+                                                    return StreamBuilder(
+                                                        stream: Firestore
+                                                            .instance
+                                                            .collection('Users')
+                                                            .document(replyData[
+                                                                'user_id'])
+                                                            .snapshots(),
+                                                        builder: (context,
+                                                            replyUserSnapshot) {
+                                                          if (!replyUserSnapshot
+                                                              .hasData) {
+                                                            return Text(
+                                                                'no data');
+                                                          }
+                                                          DocumentSnapshot
+                                                              replyUser =
+                                                              replyUserSnapshot
+                                                                  .data;
+                                                          return Column(
+                                                            children: <Widget>[
+                                                              ListTile(
+                                                                leading:
+                                                                    CircleAvatar(
+                                                                  backgroundImage: replyUser[
+                                                                              'img']
+                                                                          .isEmpty
+                                                                      ? NetworkImage(
+                                                                          "https://ui-avatars.com/api/?color=ff0000&name=${replyUser['name']}")
+                                                                      : NetworkImage(
+                                                                          replyUser[
+                                                                              'img']),
+                                                                  // backgroundImage:
+                                                                  //     NetworkImage(
+                                                                  //         "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                                                                ),
+                                                                subtitle:
+                                                                    Column(
+                                                                  crossAxisAlignment:
+                                                                      CrossAxisAlignment
+                                                                          .start,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Container(
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Color(
+                                                                            0xFFE9F1FE),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(6.0),
+                                                                      ),
+                                                                      child:
+                                                                          Padding(
+                                                                        padding:
+                                                                            EdgeInsets.all(8),
+                                                                        child: Text(
+                                                                            replyData['comment']),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                title: Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .start,
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        Text(replyData[
+                                                                            'user_name']),
+                                                                        Text(
+                                                                          DateFormat("yyyy-MM-dd hh:mm:ss")
+                                                                              .format(replyData['date_time'].toDate()),
+                                                                          // "",
+                                                                          style: TextStyle(
+                                                                              fontSize: 12,
+                                                                              color: Colors.black54),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                    SizedBox(
+                                                                      width: 6,
+                                                                    ),
+                                                                    Expanded(
+                                                                      child:
+                                                                          Text(
+                                                                        // DateFormat("yyyy-MM-dd hh:mm:ss")
+                                                                        //     .format(replyData['date_time'].toDate()),
+                                                                        "",
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                Colors.black54),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        });
+                                                  });
+                                            },
+                                          ),
+                                        ]),
+                                    title: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              checkReply[index] =
-                                                  !checkReply[index];
-                                            });
-                                            print(
-                                                "check reply $index: ${checkReply[index]}");
-                                          },
+                                        Text(comment['user_name']),
+                                        SizedBox(
+                                          width: 8,
+                                        ),
+                                        Expanded(
                                           child: Text(
-                                            'Reply',
-                                            style: TextStyle(fontSize: 14),
+                                            DateFormat("yyyy-MM-dd hh:mm:ss")
+                                                .format(comment['date_time']
+                                                    .toDate()),
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black54),
                                           ),
                                         ),
                                       ],
                                     ),
-                                    checkReply[index]
-                                        ? Container(
-                                            width: double.infinity,
-                                            child: Column(children: <Widget>[
-                                              TextField(
-                                                decoration: InputDecoration(
-                                                  hintText: 'Enter your reply',
-                                                ),
-                                                controller: replyController,
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    reply = value;
-                                                  });
-                                                },
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                              Container(
-                                                color: Color(0xFFFB7C7A),
-                                                width: 120,
-                                                height: 30,
-                                                child: FlatButton(
-                                                  onPressed: () {
-                                                    var now = DateTime.now();
-                                                    print(now);
-                                                    CollectionReference
-                                                        collectionReference =
-                                                        Firestore.instance
-                                                            .collection(
-                                                                'comments')
-                                                            .document(comment
-                                                                .documentID)
-                                                            .collection(
-                                                                'Replies');
-                                                    collectionReference.add({
-                                                      'user_id':
-                                                          AppData.activeUserId,
-                                                      'user_name': AppData
-                                                          .activeUserName,
-                                                      'user_image': 'img',
-                                                      'comment_id':
-                                                          comment.documentID,
-                                                      'comment': reply,
-                                                      'date_time': now,
-                                                    }).then((value) => print(
-                                                        value.documentID));
-                                                    replyController.clear();
-                                                  },
-                                                  child: Text(
-                                                    'Send Reply',
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                          )
-                                        : Text(''),
-                                    StreamBuilder(
-                                      stream: Firestore.instance
-                                          .collection('comments')
-                                          .document(comment.documentID)
-                                          .collection('Replies')
-                                          .orderBy('date_time')
-                                          .snapshots(),
-                                      builder: (context, snapshot2) {
-                                        if (!snapshot2.hasData) {
-                                          return Text('no data');
-                                        }
-                                        return ListView.builder(
-                                            itemCount:
-                                                snapshot2.data.documents.length,
-                                            scrollDirection: Axis.vertical,
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) {
-                                              DocumentSnapshot replyData =
-                                                  snapshot2
-                                                      .data.documents[index];
-
-                                              return Column(
-                                                children: <Widget>[
-                                                  ListTile(
-                                                    leading: CircleAvatar(
-                                                      backgroundImage: NetworkImage(
-                                                          "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
-                                                    ),
-                                                    subtitle: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Color(
-                                                                0xFFE9F1FE),
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        6.0),
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            child: Text(
-                                                                replyData[
-                                                                    'comment']),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    title: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Text(replyData[
-                                                            'user_name']),
-                                                        SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        Text(
-                                                          // DateFormat("yyyy-MM-dd hh:mm:ss")
-                                                          //     .format(comment['date_time']
-                                                          //         .toDate()),
-                                                          "",
-                                                          style: TextStyle(
-                                                              fontSize: 12,
-                                                              color: Colors
-                                                                  .black54),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            });
-                                      },
-                                    ),
-                                  ]),
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(comment['user_name']),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    DateFormat("yyyy-MM-dd hh:mm:ss")
-                                        .format(comment['date_time'].toDate()),
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black54),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      );
+                            );
+                          });
                     });
               },
             ),
@@ -2136,7 +2225,7 @@ _buildComments(BuildContext context) {
   );
 }
 
-_buildProducts(BuildContext context) {
+_buildProducts(BuildContext context, DocumentSnapshot mobile) {
   return Column(
     children: <Widget>[
       Padding(
@@ -2159,7 +2248,8 @@ _buildProducts(BuildContext context) {
                   print("Clicked");
                 },
                 child: Text(
-                  "View All",
+                  // "View All",
+                  '',
                   style: TextStyle(fontSize: 18.0, color: Colors.blue),
                   textAlign: TextAlign.end,
                 ),
@@ -2168,18 +2258,21 @@ _buildProducts(BuildContext context) {
           ],
         ),
       ),
-      buildTrending()
+      buildTrending(mobile['brand'])
     ],
   );
 }
 
-Column buildTrending() {
+Column buildTrending(String brand) {
   return Column(
     children: <Widget>[
       Container(
         height: 242,
         child: StreamBuilder(
-            stream: Firestore.instance.collection('mobiles').snapshots(),
+            stream: Firestore.instance
+                .collection('mobiles')
+                .where('brand', isEqualTo: brand)
+                .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (!snapshot.hasData) {

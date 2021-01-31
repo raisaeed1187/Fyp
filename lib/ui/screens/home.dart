@@ -84,7 +84,9 @@ class _HomeState extends State<Home> {
     print('previous list: ${AppData.previousComparisonsList.length}');
     if (AppData.compareList.length == 0) {
       final comparisonProvider = context.watch<ComparisonProvider>();
-      comparisonProvider.clearCompareList();
+      if (comparisonProvider.compareList.length != 0) {
+        comparisonProvider.clearCompareList();
+      }
     }
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
@@ -125,7 +127,7 @@ class _HomeState extends State<Home> {
           body: TabBarView(
             children: [
               DelayedDisplay(
-                delay: Duration(seconds: 1),
+                delay: Duration(milliseconds: 500),
                 child: Container(
                   child: SingleChildScrollView(
                     child: Column(
@@ -183,6 +185,7 @@ class _HomeState extends State<Home> {
                                             builder: (context) => ProductList(
                                                   mobilesList:
                                                       AppData.mobilesList,
+                                                  checkHomePage: true,
                                                 )));
                                     // Navigator.push(
                                     //   context,
@@ -212,7 +215,7 @@ class _HomeState extends State<Home> {
                             children: <Widget>[
                               Expanded(
                                 child: Text(
-                                  "Best Selling",
+                                  "Papular ",
                                   style: TextStyle(
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.bold),
@@ -222,7 +225,14 @@ class _HomeState extends State<Home> {
                               Expanded(
                                 child: GestureDetector(
                                   onTap: () {
-                                    print("Clicked");
+                                    // print("Clicked");
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => ProductList(
+                                                  mobilesList:
+                                                      AppData.mobilesList,
+                                                  checkHomePage: true,
+                                                )));
                                   },
                                   child: Text(
                                     "View All",
@@ -235,7 +245,7 @@ class _HomeState extends State<Home> {
                             ],
                           ),
                         ),
-                        buildTrending(),
+                        buildPapular(),
                         // CompareMobile(),
                         // Occasions(),
                       ],
@@ -243,10 +253,21 @@ class _HomeState extends State<Home> {
                   ),
                 ),
               ),
-              PageSearch(),
+              // PageSearch(),
               DelayedDisplay(
-                  delay: Duration(seconds: 1), child: FavoriteComparesList()),
-              DelayedDisplay(delay: Duration(seconds: 1), child: ProfilePage()),
+                delay: Duration(milliseconds: 300),
+                child: ProductList(
+                  mobilesList: AppData.mobilesList,
+                  checkHomePage: false,
+                ),
+              ),
+              DelayedDisplay(
+                  delay: Duration(milliseconds: 300),
+                  child: FavoriteComparesList(
+                    checkHomePage: false,
+                  )),
+              DelayedDisplay(
+                  delay: Duration(milliseconds: 300), child: ProfilePage()),
             ],
           ),
         ),
@@ -263,6 +284,45 @@ class _HomeState extends State<Home> {
               stream: Firestore.instance
                   .collection('mobiles')
                   .orderBy('released_date', descending: true)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return Text('no data');
+                }
+                return ListView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      DocumentSnapshot mobile = snapshot.data.documents[index];
+                      return TrendingItem(
+                        product: Product(
+                            company: mobile['brand'],
+                            name: mobile['product_name'],
+                            productId: mobile.documentID,
+                            icon: mobile['product_image'],
+                            rating: 3.5,
+                            remainingQuantity: 5,
+                            price: 'Rs ${mobile['price']}',
+                            mobile: mobile),
+                        gradientColors: [Color(0XFFa466ec), Colors.purple[400]],
+                      );
+                    });
+              }),
+        )
+      ],
+    );
+  }
+
+  Column buildPapular() {
+    return Column(
+      children: <Widget>[
+        Container(
+          height: 242,
+          child: StreamBuilder(
+              stream: Firestore.instance
+                  .collection('mobiles')
+                  .orderBy('released_date', descending: false)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -412,6 +472,7 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
+
         Text(' '),
         // IconButton(
         //   icon: Icon(
@@ -630,6 +691,7 @@ class CategoriesListView extends StatelessWidget {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ProductList(
                                 mobilesList: AppData.mobilesList,
+                                checkHomePage: true,
                               )));
                     } else {
                       document = await SearchService()
@@ -638,6 +700,7 @@ class CategoriesListView extends StatelessWidget {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => ProductList(
                                 mobilesList: doc,
+                                checkHomePage: true,
                               )));
                     }
                     // Navigator.push(
@@ -848,6 +911,7 @@ class _AllFavoriteComparesWidgetState extends State<AllFavoriteComparesWidget> {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => FavoriteComparesList(
                   compareList: queryFavorites.documents,
+                  checkHomePage: true,
                 )));
       },
     );

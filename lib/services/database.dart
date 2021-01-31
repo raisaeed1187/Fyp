@@ -18,10 +18,13 @@ class DatabaseService {
   final CollectionReference userCollection =
       Firestore.instance.collection('Users');
 
-  Future<void> addUserData(String name, String email, String img) async {
+  Future<void> addUserData(
+    String name,
+    String email,
+  ) async {
     return await userCollection
         .document(uid)
-        .setData({'name': name, 'img': img, 'email': email});
+        .setData({'name': name, 'img': '', 'email': email});
   }
 
   UserData _userDataFromSnapshot(DocumentSnapshot snapshot) {

@@ -257,7 +257,8 @@ class comparisonWidget extends StatelessWidget {
   List<Color> colors = [
     Colors.greenAccent,
     Colors.deepPurple[100],
-    Colors.deepOrange[100]
+    Colors.deepOrange[100],
+    Colors.brown[200],
   ];
   comparisonWidget({this.title, this.compareList, this.feature});
 

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_icons/ionicons.dart';
@@ -92,10 +93,13 @@ class _TrendingItemState extends State<TrendingItem> {
                           height: 20,
                           child: StreamProvider<List<FavoriteModal>>.value(
                             value: allFavorite,
-                            child: FavoriteWidget(
-                                  mobile: widget.product.mobile,
-                                ) ??
-                                Text(''),
+                            child: DelayedDisplay(
+                              delay: Duration(milliseconds: 200),
+                              child: FavoriteWidget(
+                                    mobile: widget.product.mobile,
+                                  ) ??
+                                  Text(''),
+                            ),
                           ),
                         ),
                       ],

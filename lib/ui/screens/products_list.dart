@@ -22,8 +22,8 @@ import 'package:provider/provider.dart';
 
 class ProductList extends StatefulWidget {
   List<DocumentSnapshot> mobilesList;
-
-  ProductList({this.mobilesList});
+  bool checkHomePage;
+  ProductList({@required this.mobilesList, this.checkHomePage});
 
   @override
   _ProductListState createState() => _ProductListState(mobilesList);
@@ -149,84 +149,90 @@ class _ProductListState extends State<ProductList> {
         //   "MobHub",
         //   style: TextStyle(color: Colors.black, fontSize: 16),
         // ),
-        leading: IconButton(
-          icon:
-              Icon(Ionicons.getIconData("ios-arrow-back"), color: Colors.black),
-          onPressed: () {
-            AppData.brands.clear();
-            AppData.rams.clear();
-            AppData.battries.clear();
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) => Home()));
-          },
-        ),
+        leading: widget.checkHomePage
+            ? IconButton(
+                icon: Icon(Ionicons.getIconData("ios-arrow-back"),
+                    color: Colors.black),
+                onPressed: () {
+                  AppData.brands.clear();
+                  AppData.rams.clear();
+                  AppData.battries.clear();
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) => Home()));
+                },
+              )
+            : Text(''),
         actions: <Widget>[
-          GestureDetector(
-            onTap: () {
-              if (AppData.compareList.length >= 2) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Comparison(
-                          compareList: AppData.compareList,
-                        )));
-              } else {
-                // infoToast("Select minimam two mobiles");
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                'Select minimam two mobiles',
-                                style: TextStyle(fontSize: 15),
+          widget.checkHomePage
+              ? GestureDetector(
+                  onTap: () {
+                    if (AppData.compareList.length >= 2) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => Comparison(
+                                compareList: AppData.compareList,
+                              )));
+                    } else {
+                      // infoToast("Select minimam two mobiles");
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Text(
+                                      'Select minimam two mobiles',
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        content: Text(''),
-                      );
-                    });
-              }
-            },
-            child: Container(
-              width: 35,
-              margin: EdgeInsets.only(top: 15),
-              child: Stack(
-                // overflow: Overflow.visible,
-                children: <Widget>[
-                  Icon(
-                    Icons.compare_arrows,
-                    color: Colors.black,
-                    key: key,
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
+                              content: Text(''),
+                            );
+                          });
+                    }
+                  },
+                  child: Container(
+                    width: 35,
+                    margin: EdgeInsets.only(top: 15),
                     child: Stack(
-                      alignment: Alignment.center,
+                      // overflow: Overflow.visible,
                       children: <Widget>[
-                        // Icon(
-                        //   Icons.favorite,
-                        //   color: Colors.red,
-                        //   size: 20,
-                        // ),
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10)),
+                        Icon(
+                          Icons.compare_arrows,
+                          color: Colors.black,
+                          key: key,
                         ),
-                        Text(comparisonProvider.compareList.length.toString(),
-                            style: TextStyle(fontSize: 12)),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              // Icon(
+                              //   Icons.favorite,
+                              //   color: Colors.red,
+                              //   size: 20,
+                              // ),
+                              Container(
+                                width: 15,
+                                height: 15,
+                                decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10)),
+                              ),
+                              Text(
+                                  comparisonProvider.compareList.length
+                                      .toString(),
+                                  style: TextStyle(fontSize: 12)),
+                            ],
+                          ),
+                        )
                       ],
                     ),
-                  )
-                ],
-              ),
-            ),
-          ),
+                  ),
+                )
+              : Text(''),
           AppData.brands.isNotEmpty ||
                   AppData.rams.isNotEmpty ||
                   AppData.battries.isNotEmpty

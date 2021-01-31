@@ -160,7 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               });
                             } else {
                               await DatabaseService(uid: result.uid)
-                                  .addUserData(name, email, 'img');
+                                  .addUserData(name, email);
                             }
                           }
                           // Navigator.pushReplacement(

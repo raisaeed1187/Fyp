@@ -58,8 +58,12 @@ class MapScreenState extends State<ProfilePage>
                                 decoration: new BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: new DecorationImage(
-                                    image: new ExactAssetImage(
-                                        'assets/images/me1.jpg'),
+                                    image: AppData.activeUserImage.isEmpty
+                                        ? NetworkImage(
+                                            "https://ui-avatars.com/api/?color=ff0000&name=${AppData.activeUserName}")
+                                        : NetworkImage(AppData.activeUserImage),
+                                    // image: new ExactAssetImage(
+                                    //     'assets/images/me1.jpg'),
                                     fit: BoxFit.cover,
                                     // AssetImage('assets/images/me1.jpg')
                                   ),
@@ -72,7 +76,7 @@ class MapScreenState extends State<ProfilePage>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 FlatButton(
-                                  onPressed: uploadImage,
+                                  onPressed: getImage,
                                   child: new CircleAvatar(
                                     backgroundColor: Colors.red,
                                     radius: 25.0,
@@ -157,6 +161,11 @@ class MapScreenState extends State<ProfilePage>
                                     hintText: "Enter Your Name",
                                   ),
                                   controller: nameController,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      AppData.activeUserName = value;
+                                    });
+                                  },
                                   enabled: !_status,
                                   autofocus: !_status,
                                 ),
@@ -198,7 +207,13 @@ class MapScreenState extends State<ProfilePage>
                                 decoration: const InputDecoration(
                                     hintText: "Enter Email ID"),
                                 controller: emailController,
-                                enabled: !_status,
+                                onChanged: (value) {
+                                  setState(() {
+                                    AppData.activeUserEmail = value;
+                                  });
+                                },
+                                // enabled: !_status,
+                                enabled: false,
                               ),
                             ),
                           ],
@@ -335,6 +350,7 @@ class MapScreenState extends State<ProfilePage>
                 textColor: Colors.white,
                 color: Colors.green,
                 onPressed: () {
+                  updateProfile();
                   setState(() {
                     _status = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
@@ -421,9 +437,12 @@ class MapScreenState extends State<ProfilePage>
 
       // Add location and url to database
       await Firestore.instance
-          .collection('storage')
-          .document()
-          .setData({'url': imageString, 'location': text});
+          .collection('Users')
+          .document(AppData.activeUserId)
+          .updateData({'img': imageString});
+      setState(() {
+        AppData.activeUserImage = imageString;
+      });
     } catch (e) {
       print(e.message);
       showDialog(
@@ -435,6 +454,24 @@ class MapScreenState extends State<ProfilePage>
           });
     }
   } //end add path
+
+  updateProfile() async {
+    try {
+      await Firestore.instance
+          .collection('Users')
+          .document(AppData.activeUserId)
+          .updateData({'name': AppData.activeUserName});
+    } catch (e) {
+      print(e.message);
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Text(e.message),
+            );
+          });
+    }
+  }
 
   uploadImage() async {
     final _storage = FirebaseStorage.instance;

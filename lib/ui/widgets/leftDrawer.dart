@@ -53,6 +53,10 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
             height: 150,
             child: DrawerHeader(
               child: ListTile(
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => ProfilePage()));
+                },
                 trailing: Icon(
                   Icons.chevron_right,
                   size: 28,
@@ -85,9 +89,11 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                       color: blackColor),
                 ),
                 leading: CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/me1.jpg'),
-                  // backgroundImage: NetworkImage(
-                  //     "https://miro.medium.com/fit/c/256/256/1*mZ3xXbns5BiBFxrdEwloKg.jpeg"),
+                  // backgroundImage: AssetImage('assets/images/me1.jpg'),
+                  backgroundImage: AppData.activeUserImage.isEmpty
+                      ? NetworkImage(
+                          "https://ui-avatars.com/api/?color=ff0000&name=${AppData.activeUserName}")
+                      : NetworkImage(AppData.activeUserImage),
                 ),
               ),
               decoration: BoxDecoration(
@@ -180,6 +186,7 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ProductList(
                         mobilesList: AppData.recentMobiles,
+                        checkHomePage: true,
                       )));
             },
           ),
@@ -191,8 +198,10 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                     fontWeight: FontWeight.w600,
                     color: blackColor)),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => PageSearch()));
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => ProductList(
+                        mobilesList: AppData.mobilesList,
+                      )));
               // Navigator.push(
               //   context,
               //   PageTransition(
@@ -202,23 +211,23 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               // );
             },
           ),
-          ListTile(
-            trailing: Icon(
-              Ionicons.getIconData('ios-radio-button-on'),
-              color: Color(0xFFFB7C7A),
-              size: 18,
-            ),
-            leading: Icon(Feather.getIconData('bell'), color: blackColor),
-            title: Text('Notifications',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
-            onTap: () {
-              // Nav.route(context, Checkout());
-              // DatabaseService().giveScore();
-            },
-          ),
+          // ListTile(
+          //   trailing: Icon(
+          //     Ionicons.getIconData('ios-radio-button-on'),
+          //     color: Color(0xFFFB7C7A),
+          //     size: 18,
+          //   ),
+          //   leading: Icon(Feather.getIconData('bell'), color: blackColor),
+          //   title: Text('Notifications',
+          //       style: TextStyle(
+          //           fontSize: 16,
+          //           fontWeight: FontWeight.w600,
+          //           color: blackColor)),
+          //   onTap: () {
+          //     // Nav.route(context, Checkout());
+          //     // DatabaseService().giveScore();
+          //   },
+          // ),
 
           // ListTile(
           //   leading: Icon(Feather.getIconData('settings'), color: blackColor),

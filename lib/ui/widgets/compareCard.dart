@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/utils/navigator.dart';
+import 'package:flutterfirebase/ui/widgets/favorite_compare_widget.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
 import 'package:flutterfirebase/ui/widgets/star_rating.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
+import 'package:provider/provider.dart';
 
 import '../models/product.dart';
 
@@ -18,6 +22,20 @@ class CompareMobile extends StatefulWidget {
 
 class _CompareMobileState extends State<CompareMobile> {
   List<DocumentSnapshot> compareList = [];
+  List<String> mobileNamesList = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mobileNamesList.add(widget.mobilesCompare['product_name1']);
+    mobileNamesList.add(widget.mobilesCompare['product_name2']);
+    if (["", null, false, 0].contains(widget.mobilesCompare['product_name3'])) {
+      mobileNamesList.add(widget.mobilesCompare['product_name3']);
+    }
+    if (["", null, false, 0].contains(widget.mobilesCompare['product_name4'])) {
+      mobileNamesList.add(widget.mobilesCompare['product_name4']);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +48,13 @@ class _CompareMobileState extends State<CompareMobile> {
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: 270,
+        height: 295,
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: Card(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 // Row(
                 //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,8 +78,48 @@ class _CompareMobileState extends State<CompareMobile> {
                 //     height: 1,
                 //   ),
                 // ),
+                // Text('check it'),
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection('mobiles')
+                        .where('product_name', whereIn: [
+                      widget.mobilesCompare['product_name1'],
+                      widget.mobilesCompare['product_name2'],
+                      widget.mobilesCompare['product_name3']
+                    ]).snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Text('no data');
+                      }
+
+                      List<DocumentSnapshot> compareMobiles =
+                          snapshot.data.documents;
+                      Comparator<DocumentSnapshot> mobileNameSort = (a, b) => a
+                          .data['product_name']
+                          .compareTo(b.data['product_name']);
+                      compareMobiles.sort(mobileNameSort);
+                      return Container(
+                        height: 40,
+                        width: 40,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            StreamProvider<QuerySnapshot>.value(
+                              value: favoriteCompare,
+                              child: DelayedDisplay(
+                                delay: Duration(milliseconds: 200),
+                                child: FavoriteCompareWidget(
+                                  compareList: compareMobiles,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+
                 Container(
-                  height: 230,
+                  height: 237,
                   width: double.infinity,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
@@ -315,7 +373,7 @@ class _CompareMobileState extends State<CompareMobile> {
                             )
                     ],
                   ),
-                )
+                ),
               ],
             ),
             elevation: 5,

@@ -10,7 +10,7 @@ import 'package:flutterfirebase/ProductDetails.dart';
 // import 'package:flutterfirebase/home.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/pages/pageSearchResult.dart';
-import 'package:flutterfirebase/ui/alertBox.dart';
+// import 'package:flutterfirebase/ui/alertBox.dart';
 // import 'package:flutterfirebase/provider/provider.dart';
 import 'package:flutterfirebase/ui/main.dart';
 // import 'package:flutterfirebase/ui/widgets/side_design.dart';
@@ -21,6 +21,7 @@ void main() => runApp(TechHub());
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(

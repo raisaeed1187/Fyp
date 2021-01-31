@@ -134,21 +134,21 @@ class _FullComparisonState extends State<FullComparison> {
                             compareList: compareList,
                             feature: 'sim',
                           ),
-                          comparisonWidget(
-                            title: 'Dual Sim',
-                            compareList: compareList,
-                            feature: 'sim',
-                          ),
-                          comparisonWidget(
-                            title: 'Sim Size',
-                            compareList: compareList,
-                            feature: 'sim',
-                          ),
-                          comparisonWidget(
-                            title: 'Device Type',
-                            compareList: compareList,
-                            feature: 'sim',
-                          ),
+                          // comparisonWidget(
+                          //   title: 'Dual Sim',
+                          //   compareList: compareList,
+                          //   feature: 'sim',
+                          // ),
+                          // comparisonWidget(
+                          //   title: 'Sim Size',
+                          //   compareList: compareList,
+                          //   feature: 'sim',
+                          // ),
+                          // comparisonWidget(
+                          //   title: 'Device Type',
+                          //   compareList: compareList,
+                          //   feature: 'sim',
+                          // ),
                           comparisonWidget(
                             title: 'Release Date',
                             compareList: compareList,
@@ -545,7 +545,8 @@ class comparisonWidget extends StatelessWidget {
   List<Color> colors = [
     Colors.greenAccent,
     Colors.deepPurple[100],
-    Colors.deepOrange[100]
+    Colors.deepOrange[100],
+    Colors.brown[200],
   ];
   comparisonWidget({this.title, this.compareList, this.feature});
 

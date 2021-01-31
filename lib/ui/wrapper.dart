@@ -17,8 +17,8 @@ class _WrapperState extends State<Wrapper> {
   ProgressDialog progressDialog;
   @override
   Widget build(BuildContext context) {
-    progressDialog = new ProgressDialog(context, ProgressDialogType.Normal);
-    progressDialog.setMessage('Logging in...');
+    // progressDialog = new ProgressDialog(context, ProgressDialogType.Normal);
+    // progressDialog.setMessage('Logging in...');
     final user = Provider.of<User>(context);
     print(user);
 

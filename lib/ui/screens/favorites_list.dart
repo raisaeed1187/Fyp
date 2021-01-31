@@ -205,7 +205,6 @@ class _FavoriteListState extends State<FavoriteList> {
                           if (!snap.hasData) {
                             return Text('no data');
                           }
-
                           return ListView.builder(
                             itemCount: snap.data.documents.length,
                             scrollDirection: Axis.horizontal,

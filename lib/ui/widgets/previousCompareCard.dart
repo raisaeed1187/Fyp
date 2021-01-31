@@ -62,7 +62,7 @@ class _CompareMobileState extends State<PreviousCompareCard> {
                 //   ),
                 // ),
                 Container(
-                  height: 230,
+                  height: 237,
                   width: double.infinity,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
