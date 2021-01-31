@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:commons/commons.dart';
+import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutterfirebase/ProductDetails.dart';
@@ -68,6 +69,10 @@ class _ComparisonState extends State<Comparison> {
 
   int getBattery(int index) {
     return getNumber(index, 'battery', 4);
+  }
+
+  int getWaight(int index) {
+    return getNumber(index, 'weight', 4);
   }
 
   void getScore() {
@@ -205,10 +210,11 @@ class _ComparisonState extends State<Comparison> {
     // print("screen size: ${getScreenSize(0, 'display', 3)}");
     // AppData.compareList.clear();
     // print(this.compareList.length);
-    Comparator<DocumentSnapshot> mobileNameSort =
-        (a, b) => a.data['product_name'].compareTo(b.data['product_name']);
-    compareList.sort(mobileNameSort);
+
     // compareList.sort((a, b) => a.length.compareTo(b.length));
+    // Comparator<DocumentSnapshot> mobileNameSort =
+    //     (a, b) => a.data['product_name'].compareTo(b.data['product_name']);
+    // compareList.sort(mobileNameSort);
     compareList.forEach((element) {
       compareListNames.add(element['product_name']);
     });
@@ -502,10 +508,18 @@ class _BuildCommentsState extends State<BuildComments> {
   }
 
   String selectedMobile = "";
-  List<bool> _isSelected = [false, false, false, false];
+  List<bool> _isSelected = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
 
   String compereMobiles = "";
   makeComperisonId() {
+    print(mobsNames.length);
     if (mobsNames.length == 2) {
       setState(() {
         compereMobiles = "${mobsNames[0]}-${mobsNames[1]}";

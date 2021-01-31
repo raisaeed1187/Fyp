@@ -146,20 +146,22 @@ class _LoginScreenState extends State<LoginScreen> {
                             print('favorite : ${AppData.favoriteMobiles}');
                             dynamic result = await _auth
                                 .signInWithEmailAndPassword(email, password);
-                            progressDialog.show();
+                            // progressDialog.show();
                             Future.delayed(const Duration(seconds: 1), () {
                               print(
                                   'favorite : ${AppData.favoriteMobiles.length}');
 
-                              setState(() {
-                                progressDialog.hide();
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Home(),
-                                  ),
-                                );
-                              });
+                              if (AppData.activeUserId != null) {
+                                setState(() {
+                                  // progressDialog.hide();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Home(),
+                                    ),
+                                  );
+                                });
+                              }
                             });
                             if (result == null) {
                               setState(() {

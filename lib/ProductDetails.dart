@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfirebase/favorite/main.dart';
+import 'package:flutterfirebase/modal/convertString.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
@@ -90,6 +91,10 @@ class _ProductDetailsState extends State<ProductDetails> {
     setState(() {
       disadvantage = !disadvantage;
     });
+  }
+
+  int getWaight(String feature) {
+    return ConvertString().getNumber(feature, 3);
   }
 
   bool checkCompare = false;
@@ -771,10 +776,12 @@ class _ProductDetailsState extends State<ProductDetails> {
                                           CrossAxisAlignment.start,
 //                          mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        advantageWidget(
-                                          type: 'Heavy Weight',
-                                          value: mobile['weight'],
-                                        ),
+                                        getWaight(mobile['weight']) >= 190
+                                            ? advantageWidget(
+                                                type: 'Heavy Weight',
+                                                value: mobile['weight'],
+                                              )
+                                            : Text(''),
                                       ],
                                     ),
                                   ),

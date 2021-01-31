@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:delayed_display/delayed_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_icons/ionicons.dart';
@@ -199,13 +200,16 @@ class _ProductCardState extends State<ProductCard> {
                                   ),
                           ],
                         ),
-                        Container(
-                          width: 30,
-                          height: 20,
-                          child: StreamProvider<List<FavoriteModal>>.value(
-                            value: allFavorite,
-                            child: FavoriteWidget(
-                              mobile: widget.product.mobile,
+                        DelayedDisplay(
+                          delay: Duration(milliseconds: 200),
+                          child: Container(
+                            width: 30,
+                            height: 20,
+                            child: StreamProvider<List<FavoriteModal>>.value(
+                              value: allFavorite,
+                              child: FavoriteWidget(
+                                mobile: widget.product.mobile,
+                              ),
                             ),
                           ),
                         ),
@@ -274,7 +278,7 @@ class _ProductCardState extends State<ProductCard> {
           widget.product.name,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
         ),
-        StarRating(rating: widget.product.rating, size: 10),
+        // StarRating(rating: widget.product.rating, size: 10),
         Row(
           children: <Widget>[
             Text(widget.product.price,

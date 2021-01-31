@@ -201,6 +201,7 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => ProductList(
                         mobilesList: AppData.mobilesList,
+                        checkHomePage: true,
                       )));
               // Navigator.push(
               //   context,
@@ -249,12 +250,14 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
           //   },
           // ),
           ListTile(
-            leading: Icon(Feather.getIconData('x-circle'), color: blackColor),
+            // leading: Icon(Feather.getIconData('x-circle'), color: blackColor),
+            leading: Icon(Icons.exit_to_app),
             title: Text('Logout',
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: blackColor)),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: blackColor,
+                )),
             onTap: () async {
               await _auth.signOut();
               Navigator.of(context).push(

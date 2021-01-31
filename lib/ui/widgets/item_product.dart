@@ -293,7 +293,7 @@ class _TrendingItemState extends State<TrendingItem> {
           widget.product.name,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
         ),
-        StarRating(rating: widget.product.rating, size: 10),
+        // StarRating(rating: widget.product.rating, size: 10),
         Row(
           children: <Widget>[
             Text(widget.product.price,

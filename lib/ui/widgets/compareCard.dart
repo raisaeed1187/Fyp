@@ -79,44 +79,44 @@ class _CompareMobileState extends State<CompareMobile> {
                 //   ),
                 // ),
                 // Text('check it'),
-                StreamBuilder(
-                    stream: Firestore.instance
-                        .collection('mobiles')
-                        .where('product_name', whereIn: [
-                      widget.mobilesCompare['product_name1'],
-                      widget.mobilesCompare['product_name2'],
-                      widget.mobilesCompare['product_name3']
-                    ]).snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Text('no data');
-                      }
+                // StreamBuilder(
+                //     stream: Firestore.instance
+                //         .collection('mobiles')
+                //         .where('product_name', whereIn: [
+                //       widget.mobilesCompare['product_name1'],
+                //       widget.mobilesCompare['product_name2'],
+                //       widget.mobilesCompare['product_name3']
+                //     ]).snapshots(),
+                //     builder: (context, snapshot) {
+                //       if (!snapshot.hasData) {
+                //         return Text('no data');
+                //       }
 
-                      List<DocumentSnapshot> compareMobiles =
-                          snapshot.data.documents;
-                      Comparator<DocumentSnapshot> mobileNameSort = (a, b) => a
-                          .data['product_name']
-                          .compareTo(b.data['product_name']);
-                      compareMobiles.sort(mobileNameSort);
-                      return Container(
-                        height: 40,
-                        width: 40,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: <Widget>[
-                            StreamProvider<QuerySnapshot>.value(
-                              value: favoriteCompare,
-                              child: DelayedDisplay(
-                                delay: Duration(milliseconds: 200),
-                                child: FavoriteCompareWidget(
-                                  compareList: compareMobiles,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
+                //       List<DocumentSnapshot> compareMobiles =
+                //           snapshot.data.documents;
+                //       Comparator<DocumentSnapshot> mobileNameSort = (a, b) => a
+                //           .data['product_name']
+                //           .compareTo(b.data['product_name']);
+                //       compareMobiles.sort(mobileNameSort);
+                //       return Container(
+                //         height: 40,
+                //         width: 40,
+                //         child: Stack(
+                //           alignment: Alignment.center,
+                //           children: <Widget>[
+                //             StreamProvider<QuerySnapshot>.value(
+                //               value: favoriteCompare,
+                //               child: DelayedDisplay(
+                //                 delay: Duration(milliseconds: 200),
+                //                 child: FavoriteCompareWidget(
+                //                   compareList: compareMobiles,
+                //                 ),
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       );
+                //     }),
 
                 Container(
                   height: 237,

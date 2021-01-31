@@ -17,7 +17,16 @@ class _FavoriteCompareWidgetState extends State<FavoriteCompareWidget> {
   List<String> savedWords = List<String>();
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Comparator<DocumentSnapshot> mobileNameSort =
+    //     (a, b) => a.data['product_name'].compareTo(b.data['product_name']);
+    // widget.compareList.sort(mobileNameSort);
     final favoriteCompares = Provider.of<QuerySnapshot>(context);
     // print(mobile.documentID);
     savedWords.clear();

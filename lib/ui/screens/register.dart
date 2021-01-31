@@ -121,7 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             textAlign: TextAlign.left,
                             keyboardType: TextInputType.text,
                             validator: (value) => value.length < 6
-                                ? 'Enter a password 6+ chars long'
+                                ? 'Enter a password 6+ characters long'
                                 : null,
                             onChanged: (val) {
                               setState(() {
