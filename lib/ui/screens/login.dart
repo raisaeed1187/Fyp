@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               print(
                                   'favorite : ${AppData.favoriteMobiles.length}');
 
-                              if (AppData.activeUserId != null) {
+                              if (AppData.activeUserId.isNotEmpty) {
                                 setState(() {
                                   // progressDialog.hide();
                                   Navigator.pushReplacement(

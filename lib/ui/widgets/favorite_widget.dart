@@ -17,12 +17,12 @@ class _FavoriteWidgetState extends State<FavoriteWidget> {
   List<String> savedWords = List<String>();
   @override
   Widget build(BuildContext context) {
-    final favorites = Provider.of<List<FavoriteModal>>(context);
+    final favorites = Provider.of<QuerySnapshot>(context);
     // print(mobile.documentID);
     savedWords.clear();
-    favorites.forEach((element) {
+    favorites.documents.forEach((element) {
       // print(element.productId);
-      savedWords.add(element.productName.toString());
+      savedWords.add(element.data['product_name'].toString());
     });
     print(savedWords);
     String word = widget.mobile['product_name'];

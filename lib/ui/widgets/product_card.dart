@@ -9,6 +9,7 @@ import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
@@ -205,8 +206,8 @@ class _ProductCardState extends State<ProductCard> {
                           child: Container(
                             width: 30,
                             height: 20,
-                            child: StreamProvider<List<FavoriteModal>>.value(
-                              value: allFavorite,
+                            child: StreamProvider<QuerySnapshot>.value(
+                              value: allFavoriteQuery(AppData.activeUserId),
                               child: FavoriteWidget(
                                 mobile: widget.product.mobile,
                               ),

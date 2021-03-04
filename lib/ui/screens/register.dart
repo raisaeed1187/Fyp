@@ -161,6 +161,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             } else {
                               await DatabaseService(uid: result.uid)
                                   .addUserData(name, email);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ),
+                              );
                             }
                           }
                           // Navigator.pushReplacement(

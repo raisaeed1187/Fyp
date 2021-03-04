@@ -260,6 +260,9 @@ class _leftDrawerMenuState extends State<leftDrawerMenu> {
                 )),
             onTap: () async {
               await _auth.signOut();
+              setState(() {
+                AppData.activeUserId = "";
+              });
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => LoginScreen(),

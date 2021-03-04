@@ -88,10 +88,12 @@ class _HomeState extends State<Home> {
         comparisonProvider.clearCompareList();
       }
     }
+    // final queryFavorites = Provider.of<QuerySnapshot>(context);
+
     return StreamProvider<UserData>.value(
       value: DatabaseService(uid: AppData.activeUserId).getUserData,
       child: DefaultTabController(
-        length: 4,
+        length: 3,
         child: Scaffold(
           backgroundColor: Colors.white,
           key: _scaffoldKey,
@@ -103,13 +105,13 @@ class _HomeState extends State<Home> {
                 icon: new Icon(Icons.home),
               ),
               Tab(
-                icon: new Icon(Icons.search),
-              ),
-              Tab(
-                child: StreamProvider<QuerySnapshot>.value(
-                  value: allFavoriteCompareQuery(AppData.activeUserId),
-                  child: Container(
-                    child: ComparisonTab(),
+                child: DelayedDisplay(
+                  delay: Duration(milliseconds: 200),
+                  child: StreamProvider<QuerySnapshot>.value(
+                    value: allFavoriteCompareQuery(AppData.activeUserId),
+                    child: Container(
+                      child: ComparisonTab(),
+                    ),
                   ),
                 ),
                 // icon: new Icon(Icons.compare_arrows),
@@ -215,7 +217,7 @@ class _HomeState extends State<Home> {
                             children: <Widget>[
                               Expanded(
                                 child: Text(
-                                  "Papular ",
+                                  "Popular ",
                                   style: TextStyle(
                                       fontSize: 20.0,
                                       fontWeight: FontWeight.bold),
@@ -254,13 +256,17 @@ class _HomeState extends State<Home> {
                 ),
               ),
               // PageSearch(),
-              DelayedDisplay(
-                delay: Duration(milliseconds: 300),
-                child: ProductList(
-                  mobilesList: AppData.mobilesList,
-                  checkHomePage: false,
-                ),
-              ),
+              // DelayedDisplay(
+              //   delay: Duration(milliseconds: 300),
+              //   child: FavoriteList(
+              //     mobilesList: queryFavorites.documents,
+              //     checkHomePage: false,
+              //   ),
+              // child: ProductList(
+              //   mobilesList: AppData.mobilesList,
+              //   checkHomePage: false,
+              // ),
+              // ),
               DelayedDisplay(
                   delay: Duration(milliseconds: 300),
                   child: FavoriteComparesList(
@@ -805,6 +811,7 @@ class _AllFavoritesWidgetState extends State<AllFavoritesWidget> {
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => FavoriteList(
                   mobilesList: queryFavorites.documents,
+                  checkHomePage: true,
                 )));
         // Navigator.push(
         //   context,

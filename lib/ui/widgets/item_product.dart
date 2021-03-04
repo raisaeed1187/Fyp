@@ -9,6 +9,7 @@ import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
@@ -60,19 +61,20 @@ class _TrendingItemState extends State<TrendingItem> {
     // TODO: implement initState
     super.initState();
 
-    if (AppData.compareListNames.contains(widget.product.name)) {
-      print('this mobile in list');
-      setState(() {
-        checkCompare = true;
-      });
-    }
     // print("check id: ${checkFavoriteMethod('1Yq5PFWie8CmqyyYnDTT')}");
   }
 
   @override
   Widget build(BuildContext context) {
     double trendCardWidth = 140;
-
+    if (AppData.compareListNames.length > 0) {
+      if (AppData.compareListNames.contains(widget.product.name)) {
+        print('this mobile in list');
+        setState(() {
+          checkCompare = true;
+        });
+      }
+    }
     return GestureDetector(
       child: Stack(
         children: <Widget>[
@@ -91,8 +93,8 @@ class _TrendingItemState extends State<TrendingItem> {
                         Container(
                           width: 30,
                           height: 20,
-                          child: StreamProvider<List<FavoriteModal>>.value(
-                            value: allFavorite,
+                          child: StreamProvider<QuerySnapshot>.value(
+                            value: allFavoriteQuery(AppData.activeUserId),
                             child: DelayedDisplay(
                               delay: Duration(milliseconds: 200),
                               child: FavoriteWidget(

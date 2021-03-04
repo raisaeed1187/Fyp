@@ -281,7 +281,7 @@ class _ComparisonState extends State<Comparison> {
                 alignment: Alignment.center,
                 children: <Widget>[
                   StreamProvider<QuerySnapshot>.value(
-                    value: favoriteCompare,
+                    value: allFavoriteCompareQuery(AppData.activeUserId),
                     child: FavoriteCompareWidget(
                       compareList: compareList,
                     ),
@@ -559,7 +559,7 @@ class _BuildCommentsState extends State<BuildComments> {
       ),
       width: MediaQuery.of(context).size.width,
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Column(
           children: <Widget>[
             Row(
@@ -573,7 +573,7 @@ class _BuildCommentsState extends State<BuildComments> {
                       color: Colors.black54),
                 ),
                 Container(
-                  width: 200,
+                  width: 190,
                   height: 40,
                   child: ListView(
                       shrinkWrap: true,
@@ -720,6 +720,13 @@ class _BuildCommentsState extends State<BuildComments> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
+                                          Text(
+                                              DateFormat("yyyy-MM-dd hh:mm:ss")
+                                                  .format(comment['date_time']
+                                                      .toDate()),
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.black54)),
                                           Container(
                                             width: double.infinity,
                                             height: 25,
@@ -944,8 +951,8 @@ class _BuildCommentsState extends State<BuildComments> {
                                                                               .start,
                                                                       children: <
                                                                           Widget>[
-                                                                        Text(replyData[
-                                                                            'user_name']),
+                                                                        Text(replyUser[
+                                                                            'name']),
                                                                         Text(
                                                                           DateFormat("yyyy-MM-dd hh:mm:ss")
                                                                               .format(replyData['date_time'].toDate()),
@@ -986,20 +993,20 @@ class _BuildCommentsState extends State<BuildComments> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        Text(comment['user_name']),
+                                        Text(userInfo['name']),
                                         SizedBox(
                                           width: 8,
                                         ),
-                                        Expanded(
-                                          child: Text(
-                                            DateFormat("yyyy-MM-dd hh:mm:ss")
-                                                .format(comment['date_time']
-                                                    .toDate()),
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black54),
-                                          ),
-                                        ),
+                                        // Expanded(
+                                        //   child: Text(
+                                        //     DateFormat("yyyy-MM-dd hh:mm:ss")
+                                        //         .format(comment['date_time']
+                                        //             .toDate()),
+                                        //     style: TextStyle(
+                                        //         fontSize: 12,
+                                        //         color: Colors.black54),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),

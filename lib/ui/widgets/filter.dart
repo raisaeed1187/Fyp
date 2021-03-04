@@ -524,7 +524,7 @@ class _FiltreState extends State<Filtre> {
                                   MaterialTapTargetSize.shrinkWrap,
                             ),
                           ),
-                          Text('12 GB & Above'),
+                          Text('12 GB'),
                         ],
                       ),
                     ],
@@ -608,8 +608,10 @@ class _FiltreState extends State<Filtre> {
                     // await applyFilters();
                     print("total filter: ${AppData.filterMobiles.length}");
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            ProductList(mobilesList: AppData.filterMobiles)));
+                        builder: (context) => ProductList(
+                              mobilesList: AppData.filterMobiles,
+                              checkHomePage: true,
+                            )));
                     // } else {
                     //   Navigator.of(context).push(
                     //     MaterialPageRoute(

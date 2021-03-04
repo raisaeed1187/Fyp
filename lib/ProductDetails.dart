@@ -7,6 +7,7 @@ import 'package:flutterfirebase/modal/favorite.dart';
 import 'package:flutterfirebase/modal/mobile.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/widgets/favorite_widget.dart';
 import 'package:flutterfirebase/ui/widgets/item_product.dart';
@@ -140,8 +141,8 @@ class _ProductDetailsState extends State<ProductDetails> {
             child: Stack(
               alignment: Alignment.center,
               children: <Widget>[
-                StreamProvider<List<FavoriteModal>>.value(
-                  value: allFavorite,
+                StreamProvider<QuerySnapshot>.value(
+                  value: allFavoriteQuery(AppData.activeUserId),
                   child: FavoriteWidget(
                     mobile: mobile,
                   ),
@@ -251,38 +252,40 @@ class _ProductDetailsState extends State<ProductDetails> {
                             width: 50,
                           ),
                           checkCompare
-                              ? RaisedButton(
-                                  onPressed: () {},
-                                  disabledColor: Color(0xFFFF69),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.done,
-                                        color: Colors.white,
-                                      ),
-                                      Text(
-                                        'Compare',
-                                        style: TextStyle(
+                              ? Expanded(
+                                  child: RaisedButton(
+                                    onPressed: () {},
+                                    disabledColor: Color(0xFFFF69),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.done,
                                           color: Colors.white,
-                                          fontSize: 15,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'Compare',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    color: Color(0xFFFF6969),
                                   ),
-                                  color: Color(0xFFFF6969),
                                 )
                               : RaisedButton(
                                   onPressed: () {
                                     if (AppData.compareList.length < 4) {
-                                      setState(() {
-                                        checkCompare = true;
-                                        AppData.compareList.add(mobile);
-                                      });
                                       Provider.of<ComparisonProvider>(context,
                                               listen: false)
                                           .addItemInList(mobile);
-                                      AppData.compareListNames
-                                          .add(mobile.data['product_name']);
+                                      setState(() {
+                                        checkCompare = true;
+                                        AppData.compareList.add(mobile);
+                                        AppData.compareListNames
+                                            .add(mobile.data['product_name']);
+                                      });
                                     } else {
                                       showDialog(
                                           context: context,
@@ -481,85 +484,85 @@ class _ProductDetailsState extends State<ProductDetails> {
                           );
                         },
                       ),
-                      Container(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    child: Text(
-                                      'Daraz',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black54,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    "Rs ${mobile['price'].toString()}",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black54,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                child: Row(
-                                  children: [
-                                    StarRating(
-                                      rating: 3.5,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text('Free Shipping'),
-                                      Text('2-3 Business Days')
-                                    ],
-                                  ),
-                                  FlatButton(
-                                    onPressed: () {
-                                      String url =
-                                          "https://www.amazon.com/gp/product/B07YQ58NPF/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B07YQ58NPF&linkCode=as2&tag=raisaeedanwar-20&linkId=f27148cc04cec6c7cf38e38876a147f4";
-                                      launch(url);
-                                    },
-                                    padding: EdgeInsets.only(left: 1),
-                                    child: Container(
-                                      width: 100,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: Colors.deepOrange,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Center(
-                                          child: Text(
-                                        'Shop Now',
-                                        style: TextStyle(color: Colors.white),
-                                      )),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.symmetric(horizontal: 16),
+                      //     child: Column(
+                      //       children: [
+                      //         Row(
+                      //           mainAxisAlignment:
+                      //               MainAxisAlignment.spaceBetween,
+                      //           children: [
+                      //             Container(
+                      //               margin: EdgeInsets.only(bottom: 10),
+                      //               child: Text(
+                      //                 'Daraz',
+                      //                 style: TextStyle(
+                      //                   fontSize: 18,
+                      //                   fontWeight: FontWeight.bold,
+                      //                   color: Colors.black54,
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //             Text(
+                      //               "Rs ${mobile['price'].toString()}",
+                      //               style: TextStyle(
+                      //                 fontSize: 18,
+                      //                 fontWeight: FontWeight.bold,
+                      //                 color: Colors.black54,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //         Container(
+                      //           child: Row(
+                      //             children: [
+                      //               StarRating(
+                      //                 rating: 3.5,
+                      //                 size: 20,
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //         Row(
+                      //           mainAxisAlignment:
+                      //               MainAxisAlignment.spaceBetween,
+                      //           children: [
+                      //             Column(
+                      //               crossAxisAlignment:
+                      //                   CrossAxisAlignment.start,
+                      //               children: [
+                      //                 Text('Free Shipping'),
+                      //                 Text('2-3 Business Days')
+                      //               ],
+                      //             ),
+                      //             FlatButton(
+                      //               onPressed: () {
+                      //                 String url =
+                      //                     "https://www.amazon.com/gp/product/B07YQ58NPF/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B07YQ58NPF&linkCode=as2&tag=raisaeedanwar-20&linkId=f27148cc04cec6c7cf38e38876a147f4";
+                      //                 launch(url);
+                      //               },
+                      //               padding: EdgeInsets.only(left: 1),
+                      //               child: Container(
+                      //                 width: 100,
+                      //                 height: 40,
+                      //                 decoration: BoxDecoration(
+                      //                   color: Colors.deepOrange,
+                      //                   borderRadius: BorderRadius.circular(5),
+                      //                 ),
+                      //                 child: Center(
+                      //                     child: Text(
+                      //                   'Shop Now',
+                      //                   style: TextStyle(color: Colors.white),
+                      //                 )),
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -576,22 +579,18 @@ class _ProductDetailsState extends State<ProductDetails> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  "${mobile['product_name']}'s",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Text(
+                                "${mobile['product_name']}'s",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Expanded(
-                                child: Text(
-                                  ' SPECIFICATIONS',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              Text(
+                                ' SPECIFICATIONS',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
@@ -1545,7 +1544,7 @@ class _BuildCommentsState extends State<BuildComments> {
       ),
       width: MediaQuery.of(context).size.width,
       child: Container(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         child: Column(
           children: <Widget>[
             Row(
@@ -1657,6 +1656,7 @@ class _BuildCommentsState extends State<BuildComments> {
                             DocumentSnapshot userInfo = userSnapshot.data;
                             return Container(
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   SizedBox(
                                     child: Divider(
@@ -1678,6 +1678,13 @@ class _BuildCommentsState extends State<BuildComments> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: <Widget>[
+                                          Text(
+                                              DateFormat("yyyy-MM-dd hh:mm:ss")
+                                                  .format(comment['date_time']
+                                                      .toDate()),
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.black54)),
                                           StarRating(
                                               rating: comment['rating'],
                                               size: 15),
@@ -1716,70 +1723,81 @@ class _BuildCommentsState extends State<BuildComments> {
                                           checkReply[index]
                                               ? Container(
                                                   width: double.infinity,
-                                                  child:
-                                                      Column(children: <Widget>[
-                                                    TextField(
-                                                      decoration:
-                                                          InputDecoration(
-                                                        hintText:
-                                                            'Enter your reply',
-                                                      ),
-                                                      controller:
-                                                          replyController,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          reply = value;
-                                                        });
-                                                      },
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    Container(
-                                                      color: Color(0xFFFB7C7A),
-                                                      width: 120,
-                                                      height: 30,
-                                                      child: FlatButton(
-                                                        onPressed: () {
-                                                          var now =
-                                                              DateTime.now();
-                                                          print(now);
-                                                          CollectionReference
-                                                              collectionReference =
-                                                              Firestore.instance
-                                                                  .collection(
-                                                                      'comments')
-                                                                  .document(comment
-                                                                      .documentID)
-                                                                  .collection(
-                                                                      'Replies');
-                                                          collectionReference.add({
-                                                            'user_id': AppData
-                                                                .activeUserId,
-                                                            'user_name': AppData
-                                                                .activeUserName,
-                                                            'user_image': 'img',
-                                                            'comment_id':
-                                                                comment
-                                                                    .documentID,
-                                                            'comment': reply,
-                                                            'date_time': now,
-                                                          }).then((value) =>
-                                                              print(value
-                                                                  .documentID));
-                                                          replyController
-                                                              .clear();
-                                                        },
-                                                        child: Text(
-                                                          'Send Reply',
-                                                          style: TextStyle(
-                                                            fontSize: 14,
-                                                            color: Colors.black,
+                                                  child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        TextField(
+                                                          decoration:
+                                                              InputDecoration(
+                                                            hintText:
+                                                                'Enter your reply',
+                                                          ),
+                                                          controller:
+                                                              replyController,
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              reply = value;
+                                                            });
+                                                          },
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        Container(
+                                                          color:
+                                                              Color(0xFFFB7C7A),
+                                                          width: 120,
+                                                          height: 30,
+                                                          child: FlatButton(
+                                                            onPressed: () {
+                                                              var now = DateTime
+                                                                  .now();
+                                                              print(now);
+                                                              CollectionReference
+                                                                  collectionReference =
+                                                                  Firestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'comments')
+                                                                      .document(
+                                                                          comment
+                                                                              .documentID)
+                                                                      .collection(
+                                                                          'Replies');
+                                                              collectionReference
+                                                                  .add({
+                                                                'user_id': AppData
+                                                                    .activeUserId,
+                                                                'user_name': AppData
+                                                                    .activeUserName,
+                                                                'user_image':
+                                                                    'img',
+                                                                'comment_id':
+                                                                    comment
+                                                                        .documentID,
+                                                                'comment':
+                                                                    reply,
+                                                                'date_time':
+                                                                    now,
+                                                              }).then((value) =>
+                                                                      print(value
+                                                                          .documentID));
+                                                              replyController
+                                                                  .clear();
+                                                            },
+                                                            child: Text(
+                                                              'Send Reply',
+                                                              style: TextStyle(
+                                                                fontSize: 14,
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                  ]),
+                                                      ]),
                                                 )
                                               : Text(''),
                                           StreamBuilder(
@@ -1877,8 +1895,8 @@ class _BuildCommentsState extends State<BuildComments> {
                                                                               .start,
                                                                       children: <
                                                                           Widget>[
-                                                                        Text(replyData[
-                                                                            'user_name']),
+                                                                        Text(replyUser[
+                                                                            'name']),
                                                                         Text(
                                                                           DateFormat("yyyy-MM-dd hh:mm:ss")
                                                                               .format(replyData['date_time'].toDate()),
@@ -1919,20 +1937,20 @@ class _BuildCommentsState extends State<BuildComments> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.start,
                                       children: <Widget>[
-                                        Text(comment['user_name']),
+                                        Text(userInfo['name']),
                                         SizedBox(
                                           width: 8,
                                         ),
-                                        Expanded(
-                                          child: Text(
-                                            DateFormat("yyyy-MM-dd hh:mm:ss")
-                                                .format(comment['date_time']
-                                                    .toDate()),
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.black54),
-                                          ),
-                                        ),
+                                        // Expanded(
+                                        //   child: Text(
+                                        //     DateFormat("yyyy-MM-dd hh:mm:ss")
+                                        //         .format(comment['date_time']
+                                        //             .toDate()),
+                                        //     style: TextStyle(
+                                        //         fontSize: 12,
+                                        //         color: Colors.black54),
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ),

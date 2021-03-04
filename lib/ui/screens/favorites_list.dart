@@ -19,8 +19,8 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class FavoriteList extends StatefulWidget {
   List<DocumentSnapshot> mobilesList;
-
-  FavoriteList({this.mobilesList});
+  bool checkHomePage;
+  FavoriteList({this.mobilesList, this.checkHomePage});
 
   @override
   _FavoriteListState createState() => _FavoriteListState(mobilesList);
@@ -99,7 +99,7 @@ class _FavoriteListState extends State<FavoriteList> {
                 hintStyle: TextStyle(
                     color: Color(0x40515C6F), fontFamily: 'NeusaNextPro'),
                 hintText: "Search Mobiles"),
-            searchList: AppData.mobilesList,
+            searchList: mobilesList,
             searchQueryBuilder: (query, list) {
               return list
                   .where((item) => item['product_name']
@@ -118,47 +118,58 @@ class _FavoriteListState extends State<FavoriteList> {
               );
             },
             onItemSelected: (item) {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => ProductDetails(mobile: item)));
+              if (item != null) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ProductDetails(mobile: item)));
+              }
             },
           ),
         ),
-        leading: IconButton(
-          icon:
-              Icon(Ionicons.getIconData("ios-arrow-back"), color: Colors.black),
-          onPressed: () => Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => Home())),
-        ),
+        leading: widget.checkHomePage
+            ? IconButton(
+                icon: Icon(Icons.chevron_left,
+                    color: Color(0xFFFF6969), size: 30),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+            : Text(''),
+        // leading: IconButton(
+        //   icon:
+        //       Icon(Ionicons.getIconData("ios-arrow-back"), color: Colors.black),
+        //   onPressed: () => Navigator.of(context)
+        //       .push(MaterialPageRoute(builder: (context) => Home())),
+        // ),
         actions: <Widget>[],
         backgroundColor: Colors.white,
       ),
       body: SlidingUpPanel(
         controller: slidingUpController,
-        minHeight: 42,
+        minHeight: 0,
         maxHeight: MediaQuery.of(context).size.height / 1,
         color: Colors.blueGrey,
-        panel: Filtre(),
-        collapsed: Container(
-          decoration:
-              BoxDecoration(color: Colors.blueGrey, borderRadius: radius),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.arrow_upward,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
-              Text(
-                "Filter",
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
+        panel: Text(''),
+        // panel: Filtre(),
+        // collapsed: Container(
+        //   decoration:
+        //       BoxDecoration(color: Colors.blueGrey, borderRadius: radius),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: <Widget>[
+        //       IconButton(
+        //         onPressed: () {},
+        //         icon: Icon(
+        //           Icons.arrow_upward,
+        //           color: Colors.white,
+        //           size: 16,
+        //         ),
+        //       ),
+        //       Text(
+        //         "Filter",
+        //         style: TextStyle(color: Colors.white),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         borderRadius: radius,
         body: Container(
           padding: EdgeInsets.only(top: 18),

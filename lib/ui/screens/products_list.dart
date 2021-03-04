@@ -8,6 +8,7 @@ import 'package:flutterfirebase/ProductDetails.dart';
 import 'package:flutterfirebase/modal/data.dart';
 import 'package:flutterfirebase/pages/comparison.dart';
 import 'package:flutterfirebase/provider/comparisonProvider.dart';
+import 'package:flutterfirebase/services/favorite_services.dart';
 import 'package:flutterfirebase/ui/models/product.dart';
 import 'package:flutterfirebase/ui/screens/home.dart';
 import 'package:flutterfirebase/ui/widgets/filter.dart';
@@ -249,6 +250,7 @@ class _ProductListState extends State<ProductList> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => ProductList(
                               mobilesList: AppData.mobilesList,
+                              checkHomePage: true,
                             )));
                   },
                 )
@@ -705,6 +707,7 @@ class _ProductListState extends State<ProductList> {
                           return SizedBox(
                             height: 1,
                           );
+                          // Text('not result found');
                         } //end brand, ram filter
                       } else {
                         return ProductCard(
